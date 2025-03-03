@@ -1,15 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import App from '../Index'
 
-const _layout = () => {
+const CustomButton = () => {
     return (
-        <>
-            <App />
-        </>
+        <View>
+            <Text>CustomButton</Text>
+        </View>
     )
 }
 
-export default _layout
+export default CustomButton
 
 const styles = StyleSheet.create({})
