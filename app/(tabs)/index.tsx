@@ -1,11 +1,11 @@
+import { StyleSheet, View } from 'react-native'
+import React from 'react'
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
+import Header from '@/components/Header'
 import CalendarStrip from '@/components/Calender'
+import ProgressCard from '@/components/ProgressCard'
 import Challenges from '@/components/Challenges'
 import Habits from '@/components/Habits'
-import Header from '@/components/Header'
-import ProgressCard from '@/components/ProgressCard'
-import React from 'react'
-import { StyleSheet, View } from 'react-native'
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 
 const Home = () => {
     return (

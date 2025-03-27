@@ -5,8 +5,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import OnBoradingScreen from './OnBoradingScreen/Index';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import TabsLayout from './(Tabs)/_layout';
-import Home from './(Tabs)';
+import TabsLayout from './(tabs)/_layout';
+import Home from './(tabs)/index';
 
 
 const Stack = createNativeStackNavigator()

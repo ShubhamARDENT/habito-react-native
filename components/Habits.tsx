@@ -1,7 +1,6 @@
 import React from 'react'
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
-import 'react-circular-progressbar/dist/styles.css';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { AnimatedCircularProgress } from 'react-native-circular-progress'
 
 const Habits = () => {
     const percentage = 66;
@@ -16,13 +15,12 @@ const Habits = () => {
                 <View style={styles.leftSection}>
                     <View style={styles.progressContainer}>
                         <View style={styles.progressWrapper}>
-                            <CircularProgressbar
-                                value={percentage}
-                                styles={buildStyles({
-                                    textSize: "0px",
-                                    pathColor: "blue",
-                                    trailColor: "#e0e0e0",
-                                })}
+                            <AnimatedCircularProgress
+                                size={50}
+                                width={5}
+                                fill={percentage}
+                                tintColor="#3843FF"
+                                backgroundColor="#e0e0e0"
                             />
                             <View style={styles.iconContainer}>
                                 <Text style={styles.emoji}>💧</Text>

@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#e3e4e6",
         borderWidth: 1,
         borderColor: "#e3e4e6",
-        borderRadius: "30px",
+        borderRadius: 30,
         flexDirection: "row",
         padding: 3
     },
