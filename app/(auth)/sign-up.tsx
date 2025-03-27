@@ -20,7 +20,8 @@ const SignUp = () => {
                 <View style={styles.container}>
                     {/* Back Button */}
                     <TouchableOpacity style={styles.backButton} >
-                        <Ionicons name="arrow-back" size={24} color="black" onPress={() => router.push('/Index')} />
+                        <Ionicons name="arrow-back" size={24} color="black"
+                            onPress={() => router.push('/OnBoradingScreen/Index')} />
                     </TouchableOpacity>
 
                     {/* Title */}
@@ -39,7 +40,14 @@ const SignUp = () => {
                         />
                     </View>
 
-                    <Text style={styles.label}>SURNAME</Text>
+                    <Text style={styles.label}>Email</Text>
+                    <View style={styles.inputContainer}>
+                        <TextInput style={styles.input}
+                            placeholder='Enter your Surname'
+                            placeholderTextColor="#999"
+                        />
+                    </View>
+                    <Text style={styles.label}>Password</Text>
                     <View style={styles.inputContainer}>
                         <TextInput style={styles.input}
                             placeholder='Enter your Surname'
@@ -55,7 +63,7 @@ const SignUp = () => {
                     </View>
                     <View style={styles.nextContainer}>
                         {/* Next Button */}
-                        <TouchableOpacity style={styles.nextButton} onPress={() => router.push('/choseGender')}>
+                        <TouchableOpacity style={styles.nextButton} onPress={() => router.push('/(auth)/HabitScreen')}>
                             <Text style={styles.nextButtonText}>Next</Text>
                         </TouchableOpacity>
                     </View>

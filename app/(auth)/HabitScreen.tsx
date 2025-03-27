@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
@@ -14,10 +15,11 @@ const habits = [
     { id: 8, name: 'Sleep well', emoji: '😴' },
 ];
 
+
 const HabitSelectionScreen = () => {
     const [selectedHabits, setSelectedHabits] = useState([]);
 
-    const toggleHabit = (id) => {
+    const toggleHabit = (id: number) => {
         setSelectedHabits((prev) =>
             prev.includes(id) ? prev.filter((habitId) => habitId !== id) : [...prev, id]
         );
@@ -25,10 +27,10 @@ const HabitSelectionScreen = () => {
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.backButton} >
+            {/* <TouchableOpacity style={styles.backButton}>
                 <Ionicons name="arrow-back" size={24} color="black"
-                    onPress={() => router.push('/sign-up')} />
-            </TouchableOpacity>
+                />
+            </TouchableOpacity> */}
             <Text style={styles.title}>Choose your first habits</Text>
             <Text style={styles.subtitle}>You may add more habits later</Text>
 
@@ -36,7 +38,8 @@ const HabitSelectionScreen = () => {
                 {habits.map((habit) => (
                     <TouchableOpacity
                         key={habit.id}
-                        style={[styles.card, selectedHabits.includes(habit.id) && styles.selectedCard]}
+                        style={[styles.card, selectedHabits.includes(habit.id) &&
+                            styles.selectedCard]}
                         onPress={() => toggleHabit(habit.id)}
                     >
                         <Text style={styles.emoji}>{habit.emoji}</Text>
@@ -45,7 +48,7 @@ const HabitSelectionScreen = () => {
                 ))}
             </View>
 
-            <TouchableOpacity style={styles.nextButton}>
+            <TouchableOpacity style={styles.nextButton} onPress={() => router.push("/(Tabs)/")}>
                 <Text style={styles.nextButtonText}>Next</Text>
             </TouchableOpacity>
         </View>

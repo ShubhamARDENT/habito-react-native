@@ -14,7 +14,7 @@ const choseGender = () => {
                 {/* Back Button */}
                 <View style={styles.container}>
                     <TouchableOpacity style={styles.backButton} >
-                        <Ionicons name="arrow-back" size={24} color="black" onPress={() => router.push('/sign-up')} />
+                        <Ionicons name="arrow-back" size={24} color="black" onPress={() => router.push('/(auth)/sign-up')} />
                     </TouchableOpacity>
                     <View style={styles.cardContainer}>
                         {/* Male Card */}
@@ -32,11 +32,12 @@ const choseGender = () => {
                             onPress={() => setSelectedGender('female')}
                         >
                             <Text style={[styles.emoji, selectedGender === 'male' && styles.selectedText]}>🙋🏻‍♀️</Text>
-                            <Text style={[styles.cardText, selectedGender === 'female' && styles.selectedText]}>Female</Text>
+                            <Text style={[styles.cardText, selectedGender === 'female' && styles.selectedText]}>
+                                Female</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.nextContainer}>
-                        <TouchableOpacity style={styles.nextButton} onPress={() => router.push('/(auth)/HabitScreen')}>
+                        <TouchableOpacity style={styles.nextButton} onPress={()=> router.push('/(auth)/HabitScreen')}>
                             <Text style={styles.nextButtonText}>Next</Text>
                         </TouchableOpacity>
                     </View>

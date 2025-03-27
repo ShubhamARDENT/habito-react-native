@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 
 const signIn = () => {
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -14,7 +15,8 @@ const signIn = () => {
                 <View style={styles.container}>
                     {/* Back Button */}
                     <TouchableOpacity style={styles.backButton} >
-                        <Ionicons name="arrow-back" size={24} color="black" onPress={() => router.push('/Index')} />
+                        <Ionicons name="arrow-back" size={24} color="black"
+                            onPress={() => router.push('/')} />
                     </TouchableOpacity>
 
                     {/* Title */}
@@ -52,7 +54,7 @@ const signIn = () => {
                 </View>
                 <View style={styles.nextContainer}>
                     {/* Next Button */}
-                    <TouchableOpacity style={styles.nextButton}>
+                    <TouchableOpacity style={styles.nextButton} onPress={() => router.push("/(auth)/HabitScreen")}>
                         <Text style={styles.nextButtonText}>Next</Text>
                     </TouchableOpacity>
 
