@@ -3,19 +3,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
-
 const HabitSelectionScreen = () => {
-    const [habits, setHabits] = useState([]);
-    const [selectedHabits, setSelectedHabits] = useState<number[]>([]);
+    const [habits, setHabits] = useState<{ id: number; emoji: string; title: string }[]>([]);
+    const [selectedHabits, setSelectedHabits] = useState<number>(0);
 
     useEffect(() => {
         fetchHabits()
     }, [])
 
     const toggleHabit = (id: number) => {
-        setSelectedHabits((prev) =>
-            prev.includes(id) ? prev.filter((habitId) => habitId !== id) : [...prev, id]
-        );
+        setSelectedHabits(id);
     };
 
     const fetchHabits = async () => {
@@ -43,7 +40,7 @@ const HabitSelectionScreen = () => {
 
     const handleNext = async () => {
         try {            
-            router.push("./(tabs)/");
+            router.push('../(tabs)');
         } catch (error) {
             console.error('Error during signup:', error);
             Alert.alert('Error', error?.message || 'Failed to sign up. Please try again.');
@@ -56,15 +53,14 @@ const HabitSelectionScreen = () => {
                 <Ionicons name="arrow-back" size={24} color="black"
                 />
             </TouchableOpacity> */}
-            <Text style={styles.title}>Choose your first habits</Text>
+            <Text style={styles.title}>Choose your first habit</Text>
             <Text style={styles.subtitle}>You may add more habits later</Text>
 
             <View style={styles.grid}>
                 {habits?.length > 0 && habits?.map((habit) => (
                     <TouchableOpacity
                         key={habit?.id}
-                        style={[styles.card, selectedHabits.includes(habit?.id) &&
-                            styles.selectedCard]}
+                        style={[styles.card, selectedHabits === habit?.id && styles.selectedCard]}
                         onPress={() => toggleHabit(habit?.id)}
                     >
                         <Text style={styles.emoji}>{habit?.emoji}</Text>
