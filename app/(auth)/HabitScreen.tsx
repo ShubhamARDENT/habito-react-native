@@ -1,28 +1,53 @@
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-
-const habits = [
-    { id: 1, name: 'Drink water', emoji: '💧' },
-    { id: 2, name: 'Run', emoji: '🏃' },
-    { id: 3, name: 'Read books', emoji: '📖' },
-    { id: 4, name: 'Meditate', emoji: '🧘' },
-    { id: 5, name: 'Study', emoji: '👨‍🎓' },
-    { id: 6, name: 'Journal', emoji: '📕' },
-    { id: 7, name: 'Plant trees', emoji: '🌿' },
-    { id: 8, name: 'Sleep well', emoji: '😴' },
-];
-
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
 
 const HabitSelectionScreen = () => {
-    const [selectedHabits, setSelectedHabits] = useState([]);
+    const [habits, setHabits] = useState([]);
+    const [selectedHabits, setSelectedHabits] = useState<number[]>([]);
+
+    useEffect(() => {
+        fetchHabits()
+    }, [])
 
     const toggleHabit = (id: number) => {
         setSelectedHabits((prev) =>
             prev.includes(id) ? prev.filter((habitId) => habitId !== id) : [...prev, id]
         );
+    };
+
+    const fetchHabits = async () => {
+        const signupDataString = await AsyncStorage.getItem('token');
+        if (!signupDataString) {
+            Alert.alert('Error', 'No signup data found');
+            return;
+        }
+        
+        const apiUrl = Platform.select({
+            ios: 'http://localhost:8000',
+            android: 'http://10.0.2.2:8000',
+        });
+
+        const response = await fetch(`${apiUrl}/api/v1/habits`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${signupDataString}`,
+            },
+        });
+        
+        const data = await response.json();
+        setHabits(data)
+    }
+
+    const handleNext = async () => {
+        try {            
+            router.push("./(tabs)/");
+        } catch (error) {
+            console.error('Error during signup:', error);
+            Alert.alert('Error', error?.message || 'Failed to sign up. Please try again.');
+        }
     };
 
     return (
@@ -35,20 +60,20 @@ const HabitSelectionScreen = () => {
             <Text style={styles.subtitle}>You may add more habits later</Text>
 
             <View style={styles.grid}>
-                {habits.map((habit) => (
+                {habits?.length > 0 && habits?.map((habit) => (
                     <TouchableOpacity
-                        key={habit.id}
-                        style={[styles.card, selectedHabits.includes(habit.id) &&
+                        key={habit?.id}
+                        style={[styles.card, selectedHabits.includes(habit?.id) &&
                             styles.selectedCard]}
-                        onPress={() => toggleHabit(habit.id)}
+                        onPress={() => toggleHabit(habit?.id)}
                     >
-                        <Text style={styles.emoji}>{habit.emoji}</Text>
-                        <Text style={styles.cardText}>{habit.name}</Text>
+                        <Text style={styles.emoji}>{habit?.emoji}</Text>
+                        <Text style={styles.cardText}>{habit?.title}</Text>
                     </TouchableOpacity>
                 ))}
             </View>
 
-            <TouchableOpacity style={styles.nextButton} onPress={() => router.push("/(Tabs)/")}>
+            <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
                 <Text style={styles.nextButtonText}>Next</Text>
             </TouchableOpacity>
         </View>

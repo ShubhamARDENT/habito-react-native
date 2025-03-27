@@ -1,13 +1,44 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
+import axios from 'axios';
+import { AuthResponse } from './types';
 
 const signIn = () => {
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    const BASE_URL = Platform.OS === 'android' 
+        ? 'http://10.0.2.2:8000/api/v1/auth/login'
+        : 'http://localhost:8000/api/v1/auth/login';
+
+    const handleLogin = async () => {
+        if (!email || !password) {
+            Alert.alert('Error', 'Please fill in all fields');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const response = await axios.post<AuthResponse>(BASE_URL, {
+                email,
+                password
+            });
+            
+            if (response?.data) {
+                await AsyncStorage.setItem('token', response?.data.access_token);
+                router.push("/(auth)/HabitScreen");
+            }
+        } catch (error) {
+            Alert.alert('Error', error?.response?.data?.message || 'Login failed');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <SafeAreaView className='h-full'>
@@ -46,16 +77,19 @@ const signIn = () => {
                         onChangeText={setPassword}
                         secureTextEntry
                     />
-
-                    {/* Forgot Password */}
-                    <TouchableOpacity>
-                        <Text style={styles.forgotPassword}>I forgot my password</Text>
-                    </TouchableOpacity>
                 </View>
                 <View style={styles.nextContainer}>
                     {/* Next Button */}
-                    <TouchableOpacity style={styles.nextButton} onPress={() => router.push("/(auth)/HabitScreen")}>
-                        <Text style={styles.nextButtonText}>Next</Text>
+                    <TouchableOpacity 
+                        style={[styles.nextButton, isLoading && { opacity: 0.7 }]} 
+                        onPress={handleLogin}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <Text style={styles.nextButtonText}>Next</Text>
+                        )}
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={() => router.push('/(auth)/sign-up')}>

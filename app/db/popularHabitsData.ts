@@ -36,3 +36,5 @@ export const popularHabitsData: IPopularHabitsData[] = [
         subtitle: "3 C"
     },
 ]
+
+export default popularHabitsData;

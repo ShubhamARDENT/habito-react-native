@@ -1,19 +1,98 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-
-
 const SignUp = () => {
+    const [formData, setFormData] = useState<{
+        email: string;
+        password: string;
+        full_name: string;
+        birthday: string | null;
+    }>({
+        email: '',
+        password: '',
+        full_name: '',
+        birthday: null,
+    });
 
-    const [name, SetName] = useState('')
-    const [surnmame, SetSurName] = useState('')
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
-    const [birthdate, setBirthdate] = useState(new Date());
-    const [showPicker, setShowPicker] = useState(false);
+    const dateConstraints = useMemo(() => {
+        const today = new Date();
+        const maxDate = new Date();
+        const minDate = new Date();
+        
+        // Set maximum date to today
+        maxDate.setHours(23, 59, 59, 999);
+        
+        // Set minimum date to 120 years ago (reasonable maximum age)
+        minDate.setFullYear(today.getFullYear() - 120);
+        
+        // Calculate date for 13 years ago
+        const thirteenYearsAgo = new Date();
+        thirteenYearsAgo.setFullYear(today.getFullYear() - 13);
+        
+        return {
+            maxDate: thirteenYearsAgo,
+            minDate: minDate
+        };
+    }, []);
+
+    const handleSignUp = async () => {
+        try {
+            const payload = {
+                birthday: formData.birthday,        // Changed from date_of_birth to birthday
+                email: formData.email,
+                password: formData.password,
+                name: formData.full_name,    // Changed from habits array to selected_habits
+            };
+
+            console.log('Sending payload:', payload); // Debug log
+
+            const apiUrl = Platform.select({
+                ios: 'http://localhost:8000',
+                android: 'http://10.0.2.2:8000',
+            });
+
+            const response = await fetch(`${apiUrl}/api/v1/auth/signup`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await response.json();
+            console.log('Response data:', data);
+
+            if (response?.ok) {
+                await AsyncStorage.setItem('token', JSON.stringify(data?.access_token));
+                router.push('/(auth)/HabitScreen');
+            } else {
+                // Better error handling
+                const errorMessage = data.detail?.[0]?.msg || 'Signup failed';
+                const fieldName = data.detail?.[0]?.loc?.[1] || 'unknown field';
+                throw new Error(`${errorMessage} (${fieldName})`);
+            }
+        } catch (error) {
+            console.error('Error saving signup data:', error);
+            // Add error handling/user feedback here
+        }
+    };
+
+    const onDateChange = (event: any, selectedDate?: Date) => {
+        setShowDatePicker(false);
+        if (selectedDate) {
+            const formattedDate = selectedDate.toISOString().split('T')[0];
+            setFormData(prev => ({ ...prev, birthday: formattedDate }));
+        }
+    };
+
     return (
         <SafeAreaView className='h-full'>
             <ScrollView contentContainerStyle={{ height: '100%' }}>
@@ -27,55 +106,83 @@ const SignUp = () => {
                     {/* Title */}
                     <Text style={styles.title}>Create Account</Text>
 
-                    {/* Email Input */}
-                    <Text style={styles.label}>NAME</Text>
+                    {/* Full Name Input */}
+                    <Text style={styles.label}>FULL NAME</Text>
                     <View style={styles.inputContainer}>
                         <TextInput
                             style={styles.input}
-                            placeholder="Enter your your name"
+                            placeholder="Enter your full name"
                             placeholderTextColor="#999"
-                            // onChangeText={setEmail}
+                            value={formData.full_name}
+                            onChangeText={(text) => setFormData(prev => ({...prev, full_name: text}))}
+                        />
+                    </View>
+
+                    {/* Email Input */}
+                    <Text style={styles.label}>EMAIL</Text>
+                    <View style={styles.inputContainer}>
+                        <TextInput 
+                            style={styles.input}
+                            placeholder='Enter your email'
+                            placeholderTextColor="#999"
+                            value={formData.email}
+                            onChangeText={(text) => setFormData(prev => ({...prev, email: text}))}
                             keyboardType="email-address"
                             autoCapitalize="none"
                         />
                     </View>
 
-                    <Text style={styles.label}>Email</Text>
+                    {/* Password Input */}
+                    <Text style={styles.label}>PASSWORD</Text>
                     <View style={styles.inputContainer}>
-                        <TextInput style={styles.input}
-                            placeholder='Enter your Surname'
+                        <TextInput 
+                            style={styles.input}
+                            placeholder='Enter your password'
                             placeholderTextColor="#999"
+                            value={formData.password}
+                            onChangeText={(text) => setFormData(prev => ({...prev, password: text}))}
+                            secureTextEntry
                         />
                     </View>
-                    <Text style={styles.label}>Password</Text>
-                    <View style={styles.inputContainer}>
-                        <TextInput style={styles.input}
-                            placeholder='Enter your Surname'
-                            placeholderTextColor="#999"
-                        />
-                    </View>
+
+                    {/* Birthdate Input */}
                     <Text style={styles.label}>BIRTHDATE</Text>
-                    <View style={styles.inputContainer}>
-                        <TextInput style={styles.input}
-                            placeholder='mm/dd/yyyy'
-                            placeholderTextColor="#999"
+                    <TouchableOpacity 
+                        style={styles.inputContainer}
+                        onPress={() => setShowDatePicker(true)}
+                    >
+                        <Text style={[styles.input, !formData.birthday && { color: '#999' }]}>
+                            {formData.birthday || 'Select your birthdate'}
+                        </Text>
+                    </TouchableOpacity>
+
+                    {showDatePicker && (
+                        <DateTimePicker
+                            value={formData.birthday ? new Date(formData.birthday) : dateConstraints.maxDate}
+                            mode="date"
+                            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                            onChange={onDateChange}
+                            maximumDate={dateConstraints.maxDate}
+                            minimumDate={dateConstraints.minDate}
                         />
-                    </View>
+                    )}
+
                     <View style={styles.nextContainer}>
                         {/* Next Button */}
-                        <TouchableOpacity style={styles.nextButton} onPress={() => router.push('/(auth)/HabitScreen')}>
+                        <TouchableOpacity 
+                            style={styles.nextButton} 
+                            onPress={handleSignUp}
+                        >
                             <Text style={styles.nextButtonText}>Next</Text>
                         </TouchableOpacity>
                     </View>
-
                 </View>
             </ScrollView>
         </SafeAreaView>
-    )
+    );
 }
 
 export default SignUp
-
 
 const styles = StyleSheet.create({
     nextContainer: {
@@ -147,6 +254,26 @@ const styles = StyleSheet.create({
     },
     createText: {
         color: '#2B2BEF',
+        fontWeight: 'bold',
+    },
+    modalView: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+    },
+    doneButton: {
+        alignSelf: 'flex-end',
+        padding: 10,
+    },
+    doneButtonText: {
+        color: '#2B2BEF',
+        fontSize: 16,
         fontWeight: 'bold',
     },
 });
