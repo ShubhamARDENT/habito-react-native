@@ -7,10 +7,11 @@ import OnBoradingScreen from './OnBoradingScreen/Index';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import TabsLayout from './(Tabs)/_layout';
 import Home from './(Tabs)';
+import { AuthProvider } from '@/components/auth';
 
 
 const Stack = createNativeStackNavigator()
-const Tab = createBottomTabNavigator()
+
 
 
 
@@ -19,16 +20,17 @@ const App = () => {
     return (
 
         <>
-            <Stack.Navigator initialRouteName='onBoardingScreen'>
-                <Stack.Screen name='onBoardingScreen' options={{ headerShown: false }}
-                    component={OnBoradingScreen} />
-                <Stack.Screen
-                    name="Home"
-                    component={Home}
-                    options={{ headerShown: false }}
-                />
-            </Stack.Navigator>
-
+            <AuthProvider>
+                <Stack.Navigator initialRouteName='onBoardingScreen'>
+                    <Stack.Screen name='onBoardingScreen' options={{ headerShown: false }}
+                        component={OnBoradingScreen} />
+                    <Stack.Screen
+                        name="Home"
+                        component={Home}
+                        options={{ headerShown: false }}
+                    />
+                </Stack.Navigator>
+            </AuthProvider>
         </>
 
     )

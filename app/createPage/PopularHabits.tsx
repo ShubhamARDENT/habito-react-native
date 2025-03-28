@@ -1,38 +1,145 @@
-import { View, Text, StyleSheet, FlatList, ScrollView } from 'react-native'
-import React from 'react'
-import { popularHabitsData } from '../db/popularHabitsData'
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native'
+import React, { useState } from 'react'
+
+// ✅ Predefined Template Habits (Matches Custom Habit Format)
+const templateHabits =
+    [
+        {
+
+            "habitName": "Reading",
+            "habitType": "Build",
+            "selectedIcon": "📖",
+            "goalCount": "10",
+            "goalFrequency": "Daily",
+            "goalDays": "Everyday",
+            "selectedDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            "reminderEnabled": true,
+            "reminderTime": "20:00"
+        },
+        {
+
+            "habitName": "Meditation",
+            "habitType": "Build",
+            "selectedIcon": "🧘",
+            "goalCount": "1",
+            "goalFrequency": "Daily",
+            "goalDays": "Weekdays",
+            "selectedDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+            "reminderEnabled": true,
+            "reminderTime": "07:00"
+        },
+        {
+
+            "habitName": "Junk Food",
+            "habitType": "Quit",
+            "selectedIcon": "🍔",
+            "goalCount": "0",
+            "goalFrequency": "Weekly",
+            "goalDays": "Weekend",
+            "selectedDays": ["Saturday", "Sunday"],
+            "reminderEnabled": false,
+            "reminderTime": "12:30"
+        },
+        {
+
+            "habitName": "Running",
+            "habitType": "Build",
+            "selectedIcon": "🏃",
+            "goalCount": "5",
+            "goalFrequency": "Weekly",
+            "goalDays": "Mon, Wed, Fri",
+            "selectedDays": ["Monday", "Wednesday", "Friday"],
+            "reminderEnabled": true,
+            "reminderTime": "06:30"
+        },
+        {
+
+            "habitName": "Social Media",
+            "habitType": "Quit",
+            "selectedIcon": "📱",
+            "goalCount": "1",
+            "goalFrequency": "Daily",
+            "goalDays": "Everyday",
+            "selectedDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            "reminderEnabled": false,
+            "reminderTime": "10:30"
+        }
+    ]
+
+
+
+
+const API_URL = "http://127.0.0.1:8000/api/v1/habits"; 
 
 const PopularHabits = () => {
+    const [selectedHabit, setSelectedHabit] = useState(null);
+    const [message, setMessage] = useState(""); // ✅ State for Success Message
+
+    // ✅ Function to Add Habit to Backend
+    const addHabitToBackend = async (habit) => {
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(habit), // ✅ Sends complete habit object
+            });
+
+            if (response.ok) {
+                setSelectedHabit(habit.id);
+                setMessage(`✅ "${habit.habitName}" has been added! 🎉`);
+                setTimeout(() => setMessage(""), 3000); // ✅ Remove message after 3s
+            } else {
+                setMessage("❌ Failed to add habit. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error posting habit:", error);
+            setMessage("❌ Error: Check your connection.");
+        }
+    };
+
     return (
         <View style={styles.popular_habits_main}>
-            <Text style={styles.header}>NEW GOOD HABIT</Text>
+            {message ? <Text style={styles.successMessage}>{message}</Text> : null} {/* ✅ Show Message */}
+
+            <Text style={styles.header}>CHOOSE A Template HABIT</Text>
 
             <FlatList
-                data={popularHabitsData}
-                keyExtractor={(item) => item.title}
+                data={templateHabits}
+                keyExtractor={(item) => item.selectedIcon}
                 numColumns={2}
                 columnWrapperStyle={styles.card_main}
                 renderItem={({ item }) => (
-                    <View style={styles.card}>
+                    <TouchableOpacity
+                        style={[styles.card, selectedHabit === item.selectedIcon && styles.selectedCard]}
+                        onPress={() => addHabitToBackend(item)}
+                    >
                         <View style={styles.emoji_container}>
-                            <Text style={styles.emoji}>{item.emaoji}</Text>
+                            <Text style={styles.emoji}>{item.selectedIcon}</Text>
                         </View>
-                        <Text style={styles.title}>{item.title}</Text>
-                        <Text style={styles.subtitle}>{item.subtitle}</Text>
-                    </View>
-                )
-                }
-                showsVerticalScrollIndicator={true}
+                        <Text style={styles.title}>{item.habitName}</Text>
+                        <Text style={styles.subtitle}>{item.goalFrequency}</Text>
+                    </TouchableOpacity>
+                )}
+                showsVerticalScrollIndicator={false}
             />
         </View>
-    )
-}
+    );
+};
 
-export default PopularHabits
+export default PopularHabits;
 
 const styles = StyleSheet.create({
     popular_habits_main: {
-        marginTop: 20
+        marginTop: 20,
+    },
+    successMessage: {
+        backgroundColor: "#D4EDDA",
+        color: "#155724",
+        padding: 10,
+        textAlign: "center",
+        fontWeight: "bold",
+        borderRadius: 5,
+        marginBottom: 10,
     },
     header: {
         fontSize: 16,
@@ -40,7 +147,7 @@ const styles = StyleSheet.create({
         color: "gray",
         marginBottom: 8,
         textTransform: "uppercase",
-        letterSpacing: 0.4
+        letterSpacing: 0.4,
     },
     card_main: {
         justifyContent: "space-evenly",
@@ -58,6 +165,10 @@ const styles = StyleSheet.create({
         shadowRadius: 10,
         elevation: 3,
         marginHorizontal: 5,
+        alignItems: "center",
+    },
+    selectedCard: {
+        backgroundColor: "#FFADAD", // Highlight selected card
     },
     emoji_container: {
         backgroundColor: "white",
@@ -70,18 +181,18 @@ const styles = StyleSheet.create({
     },
     emoji: {
         fontSize: 28,
-        zIndex: 1
+        zIndex: 1,
     },
     title: {
         fontSize: 18,
         fontWeight: "bold",
         color: "black",
         marginBottom: 5,
-        letterSpacing: 0.4
+        letterSpacing: 0.4,
     },
     subtitle: {
         fontSize: 14,
         color: "gray",
-        letterSpacing: 0.4
+        letterSpacing: 0.4,
     },
-})
+});

@@ -4,6 +4,8 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
+
+// * change the habits to template
 const habits = [
     { id: 1, name: 'Drink water', emoji: '💧' },
     { id: 2, name: 'Run', emoji: '🏃' },

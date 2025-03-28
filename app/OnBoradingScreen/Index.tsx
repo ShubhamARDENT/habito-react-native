@@ -1,11 +1,13 @@
 
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, } from 'react-native';
+import React, { useContext, useEffect } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { AuthContext } from '@/components/auth';
+
 
 
 const images = {
@@ -15,8 +17,23 @@ const images = {
 }
 
 
+
+
 const OnBoradingScreen = () => {
 
+  const { user, loading } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (!loading) {
+      if (user) {
+        router.push("/(Tabs)"); // Redirect to Home if logged in
+      }
+    }
+  }, [user, loading, router]);
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="blue" />;
+  }
   return (
     <SafeAreaView className='h-full bg-gradient-to-br from-[#6B73FF] to-[#000DFF]'>
       <ScrollView contentContainerStyle={{ height: '100%' }}>

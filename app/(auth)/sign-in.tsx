@@ -1,22 +1,58 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Store token
+
+const API_URL = "http://127.0.0.1:8000"; // Your FastAPI server
 
 const signIn = () => {
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleLogin = async () => {
+        if (!email || !password) {
+            Alert.alert("Error", "Email and password are required!");
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(`${API_URL}/api/v1/auth/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || "Login failed");
+            }
+
+            // Store token
+            await localStorage.setItem("token", data.access_token);
+
+        
+            router.push("/(auth)/HabitScreen"); // Redirect after login
+
+        } catch (error) {
+            Alert.alert("Login Failed", error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <SafeAreaView className='h-full'>
             <ScrollView contentContainerStyle={{ height: '100%' }}>
                 <View style={styles.container}>
                     {/* Back Button */}
-                    <TouchableOpacity style={styles.backButton} >
-                        <Ionicons name="arrow-back" size={24} color="black"
-                            onPress={() => router.push('/')} />
+                    <TouchableOpacity style={styles.backButton} onPress={() => router.push('/')}>
+                        <Ionicons name="arrow-back" size={24} color="black" />
                     </TouchableOpacity>
 
                     {/* Title */}
@@ -24,17 +60,15 @@ const signIn = () => {
 
                     {/* Email Input */}
                     <Text style={styles.label}>E-MAIL</Text>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Enter your email"
-                            placeholderTextColor="#999"
-                            value={email}
-                            onChangeText={setEmail}
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                        />
-                    </View>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Enter your email"
+                        placeholderTextColor="#999"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                    />
 
                     {/* Password Input */}
                     <Text style={styles.label}>PASSWORD</Text>
@@ -52,10 +86,15 @@ const signIn = () => {
                         <Text style={styles.forgotPassword}>I forgot my password</Text>
                     </TouchableOpacity>
                 </View>
+
                 <View style={styles.nextContainer}>
                     {/* Next Button */}
-                    <TouchableOpacity style={styles.nextButton} onPress={() => router.push("/(auth)/HabitScreen")}>
-                        <Text style={styles.nextButtonText}>Next</Text>
+                    <TouchableOpacity
+                        style={[styles.nextButton, loading && { opacity: 0.5 }]}
+                        onPress={handleLogin}
+                        disabled={loading}
+                    >
+                        <Text style={styles.nextButtonText}>{loading ? "Logging in..." : "Next"}</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={() => router.push('/(auth)/sign-up')}>
@@ -67,14 +106,11 @@ const signIn = () => {
                 </View>
             </ScrollView>
         </SafeAreaView>
-
     );
 };
 
 const styles = StyleSheet.create({
-    nextContainer: {
-        marginBottom: 20
-    },
+    nextContainer: { marginBottom: 20 },
     password: {
         padding: 10,
         marginBottom: 20,
@@ -102,17 +138,12 @@ const styles = StyleSheet.create({
         color: '#555',
         marginBottom: 5,
     },
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
+    input: {
+        height: 40,
+        fontSize: 16,
         borderBottomWidth: 1,
         borderBottomColor: 'gray',
         marginBottom: 20,
-    },
-    input: {
-        flex: 1,
-        height: 40,
-        fontSize: 16,
     },
     forgotPassword: {
         color: 'gray',
@@ -126,7 +157,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginHorizontal: 20,
         borderRadius: 30,
-
     },
     nextButtonText: {
         color: '#fff',

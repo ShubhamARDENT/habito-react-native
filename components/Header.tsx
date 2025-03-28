@@ -17,7 +17,7 @@ const Header = () => {
 
             <View style={styles.profile_info}>
                 <View>
-                    <Text style={styles.profile_header_text}>Hi, Aadesh👋</Text>
+                    <Text style={styles.profile_header_text}>Hello</Text>
                     <Text style={styles.profile_info_small_text}>Let's make habits together!</Text>
                 </View>
                 {/* <Image source={bell} height={48} width={48} /> */}
