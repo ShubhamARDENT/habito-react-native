@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
-import 'react-circular-progressbar/dist/styles.css';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
 const ProgressCard = () => {
     const percentage = 25;
@@ -9,18 +8,15 @@ const ProgressCard = () => {
     return (
         <View style={styles.card}>
             <View style={styles.content}>
-                {/* Circular Progress Indicator */}
                 <View style={styles.progressContainer}>
-                    <View >
-                        {/* <Text style={styles.percentageText}>{percentage}%</Text> */}
-                        <CircularProgressbar value={percentage} text={`${percentage}%`} styles={buildStyles({
-                            pathColor: "white",
-                            textColor: "white",
-                            trailColor: "rgba(255, 255, 255, 0.2)",
-                            strokeLinecap: "round",
-                            textSize: "30px",
-                        })} />
-                    </View>
+                    <AnimatedCircularProgress
+                        size={50}
+                        width={5}
+                        fill={percentage}
+                        tintColor="white"
+                        backgroundColor="rgba(255, 255, 255, 0.2)"
+                        rotation={0}
+                    />
                 </View>
 
                 {/* Text Content */}
