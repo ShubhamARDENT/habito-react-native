@@ -6,7 +6,6 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 const TabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
     const icons: Record<string, (props: any) => JSX.Element> = {
         index: (props) => <Ionicons name="home-outline" size={40} {...props} />,
-        profile: (props) => <Ionicons name="person-outline" size={40} {...props} />,
         create: (props) => <Ionicons name="add-circle-outline" size={40} {...props} />,
     };
 

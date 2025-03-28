@@ -40,6 +40,7 @@ const CalendarStrip = () => {
 const styles = StyleSheet.create({
     container: {
         paddingVertical: 10,
+        marginTop:30
     },
     dateContainer: {
         width: 60,
