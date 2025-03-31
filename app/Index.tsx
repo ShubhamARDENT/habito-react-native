@@ -1,70 +1,46 @@
-import { StyleSheet } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import '../global.css'
+import { StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
+import '../global.css';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch, useSelector } from 'react-redux';
+import { loadToken, RootState, AppDispatch } from '@/components/auth';
 import OnBoradingScreen from './OnBoradingScreen/Index';
 import Home from './(tabs)';
-import { AuthProvider } from '@/components/auth';
-import { authEventEmitter, AUTH_EVENTS } from '@/utils/events';
 
-const Stack = createNativeStackNavigator()
+const Stack = createNativeStackNavigator();
 
-const App = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+const AppContent = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const { loading } = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
-        checkToken();
-        
-        // Add listener for token changes
-        const handleTokenChange = () => {
-            checkToken();
-        };
+        dispatch(loadToken());
+    }, [dispatch]);
 
-        authEventEmitter.on(AUTH_EVENTS.TOKEN_CHANGE, handleTokenChange);
-
-        return () => {
-            authEventEmitter.off(AUTH_EVENTS.TOKEN_CHANGE, handleTokenChange);
-        };
-    }, []);
-
-    const checkToken = async () => {
-        try {
-            const token = await AsyncStorage.getItem('token');
-            setIsAuthenticated(!!token);
-        } catch (error) {
-            console.error('Error checking token:', error);
-            setIsAuthenticated(false);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    if (isLoading) {
-        return null; // or a loading spinner
+    if (loading) {
+        return null; // Show a loading spinner or placeholder if needed
     }
 
     return (
-        <AuthProvider>
-            <Stack.Navigator initialRouteName="onBoardingScreen">
-                <Stack.Screen 
-                    name='onBoardingScreen' 
-                    options={{ headerShown: false }}
-                    component={OnBoradingScreen} 
-                />
-                {isAuthenticated ? (
-                    <Stack.Screen
-                        name="Home"
-                        component={Home}
-                        options={{ headerShown: false }}
-                    />
-                ) : null}
-            </Stack.Navigator>
-        </AuthProvider>
-    )
-}
+        <Stack.Navigator initialRouteName={"onBoardingScreen"}>
+            <Stack.Screen
+                name="onBoardingScreen"
+                options={{ headerShown: false }}
+                component={OnBoradingScreen}
+            />
+            <Stack.Screen
+                name="Home"
+                options={{ headerShown: false }}
+                component={Home}
+            />
+        </Stack.Navigator>
+    );
+};
 
-export default App
+const App = () => {
+    return <AppContent />;
+};
 
-const styles = StyleSheet.create({})
+export default App;
+
+const styles = StyleSheet.create({});

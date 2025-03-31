@@ -1,51 +1,86 @@
-import React, { createContext, useState, useEffect } from "react";
+import { createSlice, PayloadAction, configureStore } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
+import { router } from "expo-router";
 
+interface AuthState {
+    token: string | null;
+    userName: string;
+    loading: boolean;
+}
 
+const initialState: AuthState = {
+    token: null,
+    userName: '',
+    loading: false,
+};
 
-// Provide a default value to prevent TypeScript error
-export const AuthContext = createContext({
-    user: null,
-    login: () => {},
-    logout: () => {},
-    loading: true,
+const authSlice = createSlice({
+    name: "auth",
+    initialState,
+    reducers: {
+        setToken(state, action: PayloadAction<string | null>) {
+            state.token = action.payload;
+        },
+        setUserName(state, action: PayloadAction<string>) {
+            state.userName = action.payload;
+        },
+        setLoading(state, action: PayloadAction<boolean>) {
+            state.loading = action.payload;
+        },
+        resetAuth(state) {
+            state.token = null;
+            state.userName = '';
+        },
+    },
 });
 
+export const { setToken, setUserName, setLoading, resetAuth } = authSlice.actions;
 
-export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+export const store = configureStore({
+    reducer: {
+        auth: authSlice.reducer,
+    },
+});
 
-    useEffect(() => {
-        const loadUser = async () => {
-            try {
-                const storedUser = await AsyncStorage.getItem("user");
-                if (storedUser) {
-                    setUser(JSON.parse(storedUser));
-                }
-            } catch (error) {
-                console.error("Error loading user data:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadUser();
-    }, []);
-
-    const login = async (userData) => {
-        setUser(userData);
-        await AsyncStorage.setItem("user", JSON.stringify(userData));
-    };
-
-    const logout = async () => {
-        setUser(null);
-        await AsyncStorage.removeItem("user");
-    };
-
-    return (
-        <AuthContext.Provider value={{ user, login, logout, loading }}>
-            {children}
-        </AuthContext.Provider>
-    );
+export const login = (authToken: string, type = "login") => async (dispatch: any) => {
+    try {
+        await AsyncStorage.setItem("token", authToken);
+        const decoded = jwtDecode<{ name: string }>(authToken);
+        dispatch(setToken(authToken));
+        dispatch(setUserName(decoded.name || "User"));
+        if (type === "login") router.replace("/(tabs)");
+        if (type === "signup") router.replace("/(auth)/HabitScreen");
+    } catch (error) {
+        console.error("Login error:", error);
+    }
 };
+
+export const logout = () => async (dispatch: any) => {
+    try {
+        await AsyncStorage.removeItem("token");
+        dispatch(resetAuth());
+        router.replace("/(auth)/sign-in");
+    } catch (error) {
+        console.error("Logout error:", error);
+    }
+};
+
+export const loadToken = () => async (dispatch: any) => {
+    dispatch(setLoading(true));
+    try {
+        const storedToken = await AsyncStorage.getItem("token");
+        if (storedToken) {
+            const decoded = jwtDecode<{ name: string }>(storedToken);
+            dispatch(setToken(storedToken));
+            dispatch(setUserName(decoded.name || "User"));
+        }
+    } catch (error) {
+        console.error("Error loading token:", error);
+    } finally {
+        dispatch(setLoading(false));
+    }
+};
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;

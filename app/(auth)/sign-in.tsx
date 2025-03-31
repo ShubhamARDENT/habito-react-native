@@ -3,7 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView,
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, login, setLoading, RootState } from '@/components/auth';
 
 const API_URL = Platform.select({
     android: 'http://10.0.2.2:8000', // Android emulator
@@ -14,7 +15,8 @@ const API_URL = Platform.select({
 const SignIn = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
+    const dispatch = useDispatch<AppDispatch>();
+    const loading = useSelector((state: RootState) => state.auth.loading);
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -22,7 +24,7 @@ const SignIn = () => {
             return;
         }
 
-        setLoading(true);
+        dispatch(setLoading(true));
 
         try {
             const response = await fetch(`${API_URL}/api/v1/auth/login`, {
@@ -33,16 +35,15 @@ const SignIn = () => {
 
             const data = await response.json();
 
-            if (!response.ok) {
+            if (!response?.ok) {
                 throw new Error(data.detail || "Login failed");
             }
 
-            await AsyncStorage.setItem("token", data?.access_token);
-            router.push("/(auth)/HabitScreen");
+            dispatch(login(data?.access_token));
         } catch (error) {
             Alert.alert("Login Failed", error instanceof Error ? error.message : "An unknown error occurred");
         } finally {
-            setLoading(false);
+            dispatch(setLoading(false));
         }
     };
 

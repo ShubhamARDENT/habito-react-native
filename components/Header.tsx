@@ -1,52 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { jwtDecode } from "jwt-decode";
-import { authEventEmitter, AUTH_EVENTS } from '@/utils/events';
-import { router } from 'expo-router';
-
-interface DecodedToken {
-  name: string;
-  exp: number;
-}
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, logout, RootState } from './auth';
 
 const Header = () => {
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    const [userName, setUserName] = useState('');
-
-    useEffect(() => {
-        checkAuthAndNavigate();
-    }, []);
-
-    const checkAuthAndNavigate = async () => {
-        try {
-            const token = await AsyncStorage.getItem('token');
-            if (!token) {
-                router.replace('/');
-                return;
-            }
-
-            const decoded = jwtDecode<DecodedToken>(token);
-            if (decoded.exp * 1000 < Date.now()) {
-                // Token has expired
-                await handleLogout();
-                return;
-            }
-
-            setUserName(decoded.name || 'User');
-        } catch (error) {
-            console.error('Error checking authentication:', error);
-            await handleLogout();
-        }
-    };
+    const dispatch = useDispatch<AppDispatch>();
+    const userName = useSelector((state: RootState) => state.auth.userName);
 
     const handleLogout = async () => {
         try {
-            await AsyncStorage.clear(); // Clear all storage instead of just token
             setDropdownVisible(false);
-            authEventEmitter.emit(AUTH_EVENTS.TOKEN_CHANGE);
-            router.replace('/'); // Using replace instead of push to prevent going back
+            dispatch(logout());
         } catch (error) {
             console.error('Error logging out:', error);
         }
@@ -88,7 +54,7 @@ const styles = StyleSheet.create({
     header_main: {
         paddingHorizontal: 24,
         paddingVertical: 30,
-        backgroundColor:'#fff'
+        backgroundColor: '#fff',
     },
     headerBar: {
         flexDirection: "row",
@@ -116,13 +82,13 @@ const styles = StyleSheet.create({
     dropdown: {
         position: "absolute",
         right: 24,
-        top: 85,    // Added top position to place it below the icon
+        top: 85, // Added top position to place it below the icon
         backgroundColor: "#fff",
         borderRadius: 8,
         shadowColor: "#000",
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        elevation: 5,  // Added for Android shadow
+        elevation: 5, // Added for Android shadow
         paddingVertical: 8,
         width: 100,
         alignItems: "center",

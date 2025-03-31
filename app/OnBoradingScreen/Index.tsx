@@ -1,38 +1,36 @@
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-
-import React, { useContext, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { AuthContext } from '@/components/auth';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/components/auth';
 
 const images = {
   user1: require('../../assets/images/user1.png'),
   user2: require('../../assets/images/user2.png'),
   user3: require('../../assets/images/user3.png'),
-}
+};
 
 const OnBoradingScreen = () => {
-  const { user, loading } = useContext(AuthContext);
+  const { token, loading } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     if (!loading) {
-      if (user) {
+      if (token) {
         router.push("/(tabs)"); // Redirect to Home if logged in
       }
     }
-  }, [user, loading, router]);
+  }, [token, loading]);
 
   if (loading) {
     return <ActivityIndicator size="large" color="blue" />;
   }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <LinearGradient
-        colors={['#6B73FF', '#000DFF']}
-        style={{ flex: 1 }}
-      >
+      <LinearGradient colors={['#6B73FF', '#000DFF']} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ height: '100%' }}>
           <View style={styles.container}>
             {/* User Images & Chat bubbles */}
@@ -47,22 +45,22 @@ const OnBoradingScreen = () => {
               Change your life by slowly adding new healthy habits and sticking to them.
             </Text>
             {/* Login Buttons */}
-            <TouchableOpacity style={styles.emailButton} onPress={() => router.push('/sign-in')} >
+            <TouchableOpacity style={styles.emailButton} onPress={() => router.push('/(auth)/sign-in')}>
               <FontAwesome name="envelope" size={20} color="#000" />
-              <Text style={styles.emailText}>
-                Continue with E-mail
-              </Text>
+              <Text style={styles.emailText}>Continue with E-mail</Text>
             </TouchableOpacity>
             {/* Terms & Privacy */}
-            <Text style={styles.termsText}>By continuing you agree to Terms of Services & Privacy Policy</Text>
+            <Text style={styles.termsText}>
+              By continuing you agree to Terms of Services & Privacy Policy
+            </Text>
           </View>
         </ScrollView>
       </LinearGradient>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default OnBoradingScreen
+export default OnBoradingScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -110,18 +108,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 10,
-  },
-  socialButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginTop: 10,
-  },
-  socialButton: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 30,
-    display: "flex",
   },
   termsText: {
     fontSize: 12,

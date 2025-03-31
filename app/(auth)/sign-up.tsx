@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
     View,
@@ -13,7 +12,8 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch } from "react-redux";
+import { AppDispatch, login, setLoading } from "@/components/auth";
 
 const API_URL = Platform.select({
     android: 'http://10.0.2.2:8000/api/v1/auth/signup', // Android emulator
@@ -26,7 +26,7 @@ const SignUp = () => {
     const [surname, setSurname] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
+    const dispatch = useDispatch<AppDispatch>();
 
     const handleSignUp = async () => {
         if (!name || !surname || !email || !password) {
@@ -35,11 +35,13 @@ const SignUp = () => {
         }
 
         const userData = {
-            name: `${name}`, 
+            name: `${name}`,
             surname: `${surname}`,
             email: email,
             password: password,
         };
+
+        dispatch(setLoading(true));
 
         try {
             const response = await fetch(`${API_URL}`, {
@@ -49,18 +51,19 @@ const SignUp = () => {
                 },
                 body: JSON.stringify(userData),
             });
-        
+
             const data = await response.json();
 
             if (!response.ok) {
                 throw new Error(data.detail || "Signup failed");
             }
-            
-            await AsyncStorage.setItem("token", data?.access_token);
+
+            dispatch(login(data?.access_token, "signup"));
             Alert.alert("Success", "Account created successfully!");
-            router.push("/(auth)/HabitScreen");
         } catch (error) {
             Alert.alert("Signup Failed", error instanceof Error ? error.message : "An unknown error occurred");
+        } finally {
+            dispatch(setLoading(false));
         }
     };
 
@@ -74,7 +77,7 @@ const SignUp = () => {
                             name="arrow-back"
                             size={24}
                             color="black"
-                            onPress={() => router.push("/OnBoradingScreen/Index")}
+                            onPress={() => router.push("/(auth)/sign-in")}
                         />
                     </TouchableOpacity>
 
@@ -131,8 +134,6 @@ const SignUp = () => {
                             onChangeText={setPassword}
                         />
                     </View>
-
-
 
                     <View style={styles.nextContainer}>
                         {/* Signup Button */}
