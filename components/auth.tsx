@@ -43,14 +43,14 @@ export const store = configureStore({
     },
 });
 
-export const login = (authToken: string, type = "login") => async (dispatch: any) => {
+export const login = (authToken: string, type: string = "login") => async (dispatch: any) => {
     try {
         await AsyncStorage.setItem("token", authToken);
         const decoded = jwtDecode<{ name: string }>(authToken);
         dispatch(setToken(authToken));
         dispatch(setUserName(decoded.name || "User"));
-        if (type === "login") router.replace("/(tabs)");
-        if (type === "signup") router.replace("/(auth)/HabitScreen");
+        if (type === "login") router.push("/(tabs)");
+        if (type === "signup") router.push("/(auth)/HabitScreen");
     } catch (error) {
         console.error("Login error:", error);
     }

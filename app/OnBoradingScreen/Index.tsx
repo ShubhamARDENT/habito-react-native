@@ -1,6 +1,6 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -14,15 +14,7 @@ const images = {
 };
 
 const OnBoradingScreen = () => {
-  const { token, loading } = useSelector((state: RootState) => state.auth);
-
-  useEffect(() => {
-    if (!loading) {
-      if (token) {
-        router.push("/(tabs)"); // Redirect to Home if logged in
-      }
-    }
-  }, [token, loading]);
+  const { loading } = useSelector((state: RootState) => state.auth);
 
   if (loading) {
     return <ActivityIndicator size="large" color="blue" />;

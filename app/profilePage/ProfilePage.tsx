@@ -33,7 +33,7 @@ const ProfilePage = () => {
                     <Text style={styles.points}>🏅 1452 Points</Text>
                 </View>
                 <TouchableOpacity style={styles.settingsButton}>
-                    <Text style={styles.settingsIcon} onPress={() => router.push("/(Tabs)/homePage/settingsScreen")}>⚙️</Text>
+                    <Text style={styles.settingsIcon} onPress={() => router.push("/(tabs)/homePage/settingsScreen")}>⚙️</Text>
                 </TouchableOpacity>
             </View>
 
