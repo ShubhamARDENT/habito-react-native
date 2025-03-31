@@ -78,8 +78,10 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
     },
     emojiText: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         fontSize: 20,
-        textAlign: 'center',
     },
     title: {
         fontSize: 16,
@@ -131,7 +133,7 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: "41%",
         left: "41%",
-        transform: [{ translateX: -10 }, { translateY: -10 }],
+        transform: [{ translateX: -8 }, { translateY: -10 }],
     },
     card: {
         marginVertical: 10,
