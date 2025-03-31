@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native'
 import React from 'react'
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
@@ -23,13 +23,21 @@ const HabitCards = ({ handleDeleteHabits, item }: HabitCardsProps) => {
                             backgroundColor="#e0e0e0"
                         />
                         <View style={styles.iconContainer}>
-                            <Text style={styles.emoji}>{item.selectedIcon}</Text>
+                            {item.emoji?.startsWith('http') ? (
+                                <Image 
+                                    source={{ uri: item.emoji }} 
+                                    style={styles.emojiImage} 
+                                />
+                            ) : (
+                                <Text style={styles.emojiText}>
+                                    {item.emoji}
+                                </Text>
+                            )}
                         </View>
                     </View>
                 </View>
                 <View>
-                    <Text style={styles.title}>{item.habitName}</Text>
-                    <Text style={styles.subtitle}>{item.goalCount}/{item.goalFrequency}</Text>
+                    <Text style={styles.title}>{item.title}</Text>
                 </View>
             </View>
 
@@ -63,6 +71,15 @@ const styles = StyleSheet.create({
     },
     emoji: {
         fontSize: 20,
+    },
+    emojiImage: {
+        width: 20,
+        height: 20,
+        resizeMode: 'contain',
+    },
+    emojiText: {
+        fontSize: 20,
+        textAlign: 'center',
     },
     title: {
         fontSize: 16,

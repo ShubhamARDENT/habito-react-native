@@ -63,7 +63,6 @@ const HabitForm = () => {
             }
 
             const newHabit = await response.json();
-            console.log("Habit added successfully:", newHabit);
 
             // Update state with the new habit
             setHabits((prev) => [...prev, newHabit]);

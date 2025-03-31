@@ -3,7 +3,6 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'; // Using Expo Icons (Replace if not using Expo)
 
 const Header = () => {
-    const [toggleTodayClub, setToggleTodayClub] = useState("Today");
     const [dropdownVisible, setDropdownVisible] = useState(false);
 
     return (
