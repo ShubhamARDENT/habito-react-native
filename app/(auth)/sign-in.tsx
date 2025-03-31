@@ -11,7 +11,7 @@ const API_URL = Platform.select({
     default: 'http://127.0.0.1:8000', // Local development
 });
 
-const signIn = () => {
+const SignIn = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -36,7 +36,7 @@ const signIn = () => {
             if (!response.ok) {
                 throw new Error(data.detail || "Login failed");
             }
-            
+
             await AsyncStorage.setItem("token", data?.access_token);
             router.push("/(auth)/HabitScreen");
         } catch (error) {
@@ -169,4 +169,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default signIn;
+export default SignIn;

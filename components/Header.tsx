@@ -3,6 +3,8 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from "jwt-decode";
+import { authEventEmitter, AUTH_EVENTS } from '@/utils/events';
+import { router } from 'expo-router';
 
 interface DecodedToken {
   name: string;
@@ -14,21 +16,41 @@ const Header = () => {
     const [userName, setUserName] = useState('');
 
     useEffect(() => {
-        const getUserName = async () => {
-            try {
-                const token = await AsyncStorage.getItem('token');
-                if (token) {
-                    const decoded = jwtDecode<DecodedToken>(token);
-                    setUserName(decoded.name || 'User');
-                }
-            } catch (error) {
-                console.error('Error decoding token:', error);
-                setUserName('User');
-            }
-        };
-
-        getUserName();
+        checkAuthAndNavigate();
     }, []);
+
+    const checkAuthAndNavigate = async () => {
+        try {
+            const token = await AsyncStorage.getItem('token');
+            if (!token) {
+                router.replace('/');
+                return;
+            }
+
+            const decoded = jwtDecode<DecodedToken>(token);
+            if (decoded.exp * 1000 < Date.now()) {
+                // Token has expired
+                await handleLogout();
+                return;
+            }
+
+            setUserName(decoded.name || 'User');
+        } catch (error) {
+            console.error('Error checking authentication:', error);
+            await handleLogout();
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            await AsyncStorage.clear(); // Clear all storage instead of just token
+            setDropdownVisible(false);
+            authEventEmitter.emit(AUTH_EVENTS.TOKEN_CHANGE);
+            router.replace('/'); // Using replace instead of push to prevent going back
+        } catch (error) {
+            console.error('Error logging out:', error);
+        }
+    };
 
     return (
         <View style={styles.header_main}>
@@ -51,7 +73,7 @@ const Header = () => {
             {/* Small Profile Dropdown */}
             {dropdownVisible && (
                 <View style={styles.dropdown}>
-                    <TouchableOpacity style={styles.dropdownItem} onPress={() => console.log("Logout pressed")}>
+                    <TouchableOpacity style={styles.dropdownItem} onPress={handleLogout}>
                         <Text style={styles.dropdownText}>Logout</Text>
                     </TouchableOpacity>
                 </View>
