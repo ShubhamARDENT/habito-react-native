@@ -6,14 +6,9 @@ import OnBoradingScreen from './OnBoradingScreen/Index';
 import Home from './(tabs)';
 import { AuthProvider } from '@/components/auth';
 
-
 const Stack = createNativeStackNavigator()
 
-
-
-
 const App = () => {
-
     return (
             <AuthProvider>
                 <Stack.Navigator initialRouteName='onBoardingScreen'>
