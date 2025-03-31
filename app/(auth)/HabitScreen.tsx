@@ -28,10 +28,6 @@ const HabitSelectionScreen = () => {
 
     return (
         <View style={styles.container}>
-            {/* <TouchableOpacity style={styles.backButton}>
-                <Ionicons name="arrow-back" size={24} color="black"
-                />
-            </TouchableOpacity> */}
             <Text style={styles.title}>Choose your first habits</Text>
             <Text style={styles.subtitle}>You may add more habits later</Text>
 

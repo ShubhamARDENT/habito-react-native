@@ -10,7 +10,7 @@ const CustomHabit = () => {
             <Text style={styles.header}>NEW GOOD HABIT</Text>
             <View style={styles.inputContainer}>
                 <Text style={styles.inputText}>Create Custom Habit</Text>
-                <TouchableOpacity onPress={() => router.push("/(Tabs)/habitForm")} style={styles.plusButton}>
+                <TouchableOpacity onPress={() => router.push("/(tabs)/habitForm")} style={styles.plusButton}>
                     <AntDesign name="plus" size={20} color="black" />
                 </TouchableOpacity>
             </View>

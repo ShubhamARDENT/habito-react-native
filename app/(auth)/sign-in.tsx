@@ -36,14 +36,11 @@ const signIn = () => {
             if (!response.ok) {
                 throw new Error(data.detail || "Login failed");
             }
-
-            // Store token
-            await AsyncStorage.setItem("token", data.access_token);
-
-            router.push("/(auth)/HabitScreen"); // Redirect after login
-
+            
+            await AsyncStorage.setItem("token", data?.access_token);
+            router.push("/(auth)/HabitScreen");
         } catch (error) {
-            Alert.alert("Login Failed", error.message);
+            Alert.alert("Login Failed", error instanceof Error ? error.message : "An unknown error occurred");
         } finally {
             setLoading(false);
         }

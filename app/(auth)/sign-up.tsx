@@ -13,9 +13,13 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-const API_URL = "http://127.0.0.1:8000/api/v1/auth/signup"; // Replace with your FastAPI server URL
+const API_URL = Platform.select({
+    android: 'http://10.0.2.2:8000/api/v1/auth/signup', // Android emulator
+    ios: 'http://localhost:8000/api/v1/auth/signup',     // iOS simulator
+    default: 'http://127.0.0.1:8000/api/v1/auth/signup', // Local development
+});
 
 const SignUp = () => {
     const [name, setName] = useState("");
@@ -45,20 +49,18 @@ const SignUp = () => {
                 },
                 body: JSON.stringify(userData),
             });
-
         
             const data = await response.json();
 
             if (!response.ok) {
                 throw new Error(data.detail || "Signup failed");
             }
-
+            
+            await AsyncStorage.setItem("token", data?.access_token);
             Alert.alert("Success", "Account created successfully!");
-
-            // Navigate to the next screen after signup
             router.push("/(auth)/HabitScreen");
         } catch (error) {
-            Alert.alert("Signup Failed", error.message);
+            Alert.alert("Signup Failed", error instanceof Error ? error.message : "An unknown error occurred");
         }
     };
 

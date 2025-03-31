@@ -72,11 +72,23 @@ const templateHabits =
 const API_URL = "http://127.0.0.1:8000/api/v1/habits"; 
 
 const PopularHabits = () => {
-    const [selectedHabit, setSelectedHabit] = useState(null);
+    const [selectedHabit, setSelectedHabit] = useState<string | null>(null);
     const [message, setMessage] = useState(""); // ✅ State for Success Message
 
     // ✅ Function to Add Habit to Backend
-    const addHabitToBackend = async (habit) => {
+    interface Habit {
+        habitName: string;
+        habitType: string;
+        selectedIcon: string;
+        goalCount: string;
+        goalFrequency: string;
+        goalDays: string;
+        selectedDays: string[];
+        reminderEnabled: boolean;
+        reminderTime: string;
+    }
+
+    const addHabitToBackend = async (habit: Habit): Promise<void> => {
         try {
             const response = await fetch(API_URL, {
                 method: "POST",
@@ -85,7 +97,7 @@ const PopularHabits = () => {
             });
 
             if (response.ok) {
-                setSelectedHabit(habit.id);
+                setSelectedHabit(habit.selectedIcon);
                 setMessage(`✅ "${habit.habitName}" has been added! 🎉`);
                 setTimeout(() => setMessage(""), 3000); // ✅ Remove message after 3s
             } else {

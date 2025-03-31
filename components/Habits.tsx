@@ -9,7 +9,12 @@ const API_URI = Platform.select({
 });
 
 const Habits = () => {
-    const [habits, setHabits] = useState([]);
+    interface Habit {
+        _id: string;
+        [key: string]: any; // Add other properties as needed
+    }
+
+    const [habits, setHabits] = useState<Habit[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -54,11 +59,11 @@ const Habits = () => {
                 <Text style={styles.view}>VIEW ALL</Text>
             </View>
 
-            {habits?.map((item, index) => (
+            {habits?.map((item) => (
                 item?._id ? (
                     <HabitCards key={item._id.toString()} item={item} handleDeleteHabits={handleDeleteHabits} />
                 ) : (
-                    <Text key={index} style={{ color: "red" }}>Invalid habit data</Text>
+                    <Text key={`invalid`} style={{ color: "red" }}>Invalid habit data</Text>
                 )
             ))}
         </View>

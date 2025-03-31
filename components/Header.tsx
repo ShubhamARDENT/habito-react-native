@@ -1,9 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons'; // Using Expo Icons (Replace if not using Expo)
+import { MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from "jwt-decode";
+
+interface DecodedToken {
+  name: string;
+  exp: number;
+}
 
 const Header = () => {
     const [dropdownVisible, setDropdownVisible] = useState(false);
+    const [userName, setUserName] = useState('');
+
+    useEffect(() => {
+        const getUserName = async () => {
+            try {
+                const token = await AsyncStorage.getItem('token');
+                if (token) {
+                    const decoded = jwtDecode<DecodedToken>(token);
+                    setUserName(decoded.name || 'User');
+                }
+            } catch (error) {
+                console.error('Error decoding token:', error);
+                setUserName('User');
+            }
+        };
+
+        getUserName();
+    }, []);
 
     return (
         <View style={styles.header_main}>
@@ -13,7 +38,7 @@ const Header = () => {
             {/* Profile Section */}
             <View style={styles.profile_info}>
                 <View>
-                    <Text style={styles.profile_header_text}>Hello</Text>
+                    <Text style={styles.profile_header_text}>Hello, {userName}!</Text>
                     <Text style={styles.profile_info_small_text}>Let's make habits together!</Text>
                 </View>
 
@@ -31,8 +56,6 @@ const Header = () => {
                     </TouchableOpacity>
                 </View>
             )}
-
-            
         </View>
     );
 };
@@ -43,8 +66,7 @@ const styles = StyleSheet.create({
     header_main: {
         paddingHorizontal: 24,
         paddingVertical: 30,
-        // backgroundColor:'red'
-
+        backgroundColor:'#fff'
     },
     headerBar: {
         flexDirection: "row",
@@ -62,7 +84,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.4,
     },
     profile_info_small_text: {
-        color: "#d4d4d4",
+        color: "#888",
         fontSize: 16,
         letterSpacing: 0.4,
     },
@@ -71,16 +93,18 @@ const styles = StyleSheet.create({
     },
     dropdown: {
         position: "absolute",
-        right:60,
-        // top: 90,    
+        right: 24,
+        top: 85,    // Added top position to place it below the icon
         backgroundColor: "#fff",
         borderRadius: 8,
         shadowColor: "#000",
         shadowOpacity: 0.1,
         shadowRadius: 4,
+        elevation: 5,  // Added for Android shadow
         paddingVertical: 8,
         width: 100,
         alignItems: "center",
+        zIndex: 1000, // Added to ensure dropdown appears above other elements
     },
     dropdownItem: {
         paddingVertical: 10,

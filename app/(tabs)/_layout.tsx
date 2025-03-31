@@ -1,6 +1,18 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
+const HomeTabBarIcon = ({ color, size }: { color: string; size: number }) => (
+  <Ionicons name="home" size={size} color={color} />
+);
+
+const ProfileTabBarIcon = ({ color, size }: { color: string; size: number }) => (
+  <Ionicons name="person" size={size} color={color} />
+);
+
+const AddHabitTabBarIcon = ({ color, size }: { color: string; size: number }) => (
+  <Ionicons name="add-circle" size={size} color={color} />
+);
+
 export default function TabLayout() {
   return (
     <Tabs>
@@ -8,27 +20,22 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
-          ),
+          tabBarIcon: HomeTabBarIcon,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person" size={size} color={color} />
-          ),
+          tabBarIcon: ProfileTabBarIcon,
         }}
       />
       <Tabs.Screen
-        name="habitForm"
+        name="create"
         options={{
           title: 'Add Habit',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="add-circle" size={size} color={color} />
-          ),
+          tabBarIcon: AddHabitTabBarIcon,
         }}
       />
     </Tabs>
