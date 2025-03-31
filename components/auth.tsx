@@ -6,12 +6,16 @@ import { router } from "expo-router";
 interface AuthState {
     token: string | null;
     userName: string;
+    userEmail: string;
+    userId: string;
     loading: boolean;
 }
 
 const initialState: AuthState = {
     token: null,
     userName: '',
+    userEmail: '',
+    userId: '',
     loading: false,
 };
 
@@ -25,6 +29,12 @@ const authSlice = createSlice({
         setUserName(state, action: PayloadAction<string>) {
             state.userName = action.payload;
         },
+        setUserEmail(state, action: PayloadAction<string>) {
+            state.userEmail = action.payload;
+        },
+        setUserId(state, action: PayloadAction<string>) {
+            state.userId = action.payload;
+        },
         setLoading(state, action: PayloadAction<boolean>) {
             state.loading = action.payload;
         },
@@ -35,7 +45,7 @@ const authSlice = createSlice({
     },
 });
 
-export const { setToken, setUserName, setLoading, resetAuth } = authSlice.actions;
+export const { setToken, setUserName, setUserEmail, setLoading, resetAuth, setUserId } = authSlice.actions;
 
 export const store = configureStore({
     reducer: {
@@ -46,9 +56,11 @@ export const store = configureStore({
 export const login = (authToken: string, type: string = "login") => async (dispatch: any) => {
     try {
         await AsyncStorage.setItem("token", authToken);
-        const decoded = jwtDecode<{ name: string }>(authToken);
+        const decoded = jwtDecode<{ name: string; email: string; sub: string }>(authToken);
         dispatch(setToken(authToken));
         dispatch(setUserName(decoded.name || "User"));
+        dispatch(setUserEmail(decoded.email));
+        dispatch(setUserId(decoded.sub));
         if (type === "login") router.push("/(tabs)");
         if (type === "signup") router.push("/(auth)/HabitScreen");
     } catch (error) {
@@ -71,9 +83,11 @@ export const loadToken = () => async (dispatch: any) => {
     try {
         const storedToken = await AsyncStorage.getItem("token");
         if (storedToken) {
-            const decoded = jwtDecode<{ name: string }>(storedToken);
+            const decoded = jwtDecode<{ name: string; email: string; sub: string }>(storedToken);
             dispatch(setToken(storedToken));
             dispatch(setUserName(decoded.name || "User"));
+            dispatch(setUserEmail(decoded.email));
+            dispatch(setUserId(decoded.sub));
         }
     } catch (error) {
         console.error("Error loading token:", error);

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator, Platform } from 'react-native';
+import { useSelector } from 'react-redux';
+import { RootState } from './auth';
 import HabitCards from './HabitCards';
 
 const API_URI = Platform.select({
-    ios: 'http://localhost:8000/api/v1/habits',
-    android: 'http://10.0.2.2:8000/api/v1/habits',
-    default: 'http://127.0.0.1:8000/api/v1/habits',
+    ios: 'http://localhost:8000',
+    android: 'http://10.0.2.2:8000',
+    default: 'http://127.0.0.1:8000',
 });
 
 const Habits = () => {
@@ -16,11 +18,12 @@ const Habits = () => {
 
     const [habits, setHabits] = useState<Habit[]>([]);
     const [loading, setLoading] = useState(true);
+    const userId = useSelector((state: RootState) => state.auth.userId);
 
     useEffect(() => {
         const fetchHabits = async () => {
             try {
-                const response = await fetch(`${API_URI}`);
+                const response = await fetch(`${API_URI}/api/v1/${userId}/habits`);
                 const addedHabit = await response.json();
                 setHabits(addedHabit.data);
             } catch (error) {
@@ -31,7 +34,7 @@ const Habits = () => {
         };
 
         fetchHabits();
-    }, []);
+    }, [userId]);
 
     if (loading) {
         return <ActivityIndicator size="large" color="blue" />;
