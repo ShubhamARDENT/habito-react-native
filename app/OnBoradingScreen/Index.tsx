@@ -1,14 +1,11 @@
-
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { LinearGradient } from 'expo-linear-gradient';
 
 import React, { useContext, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { AuthContext } from '@/components/auth';
-
-
 
 const images = {
   user1: require('../../assets/images/user1.png'),
@@ -16,17 +13,13 @@ const images = {
   user3: require('../../assets/images/user3.png'),
 }
 
-
-
-
 const OnBoradingScreen = () => {
-
   const { user, loading } = useContext(AuthContext);
 
   useEffect(() => {
     if (!loading) {
       if (user) {
-        router.push("/(Tabs)"); // Redirect to Home if logged in
+        router.push("/(tabs)"); // Redirect to Home if logged in
       }
     }
   }, [user, loading, router]);
@@ -35,42 +28,47 @@ const OnBoradingScreen = () => {
     return <ActivityIndicator size="large" color="blue" />;
   }
   return (
-    <SafeAreaView className='h-full bg-gradient-to-br from-[#6B73FF] to-[#000DFF]'>
-      <ScrollView contentContainerStyle={{ height: '100%' }}>
-        <View style={styles.container}>
-          {/* User Images & Chat bubbles */}
-          <View style={styles.imageContainer}>
-            <Image source={images['user1']} style={styles.userImage} />
-            <Image source={images['user2']} style={styles.userImage} />
-            <Image source={images['user3']} style={styles.userImage} />
-          </View>
-          {/* Title */}
-          <Text style={styles.title}>Create Good Habits</Text>
-          <Text style={styles.subtitle}>
-            Change your life by slowly adding new healthy habits and sticking to them.
-          </Text>
-          {/* Login Buttons */}
-          <TouchableOpacity style={styles.emailButton} onPress={() => router.push('/sign-in')} >
-            <FontAwesome name="envelope" size={20} color="#000" />
-            <Text style={styles.emailText}>
-              Continue with E-mail
+    <SafeAreaView style={{ flex: 1 }}>
+      <LinearGradient
+        colors={['#6B73FF', '#000DFF']}
+        style={{ flex: 1 }}
+      >
+        <ScrollView contentContainerStyle={{ height: '100%' }}>
+          <View style={styles.container}>
+            {/* User Images & Chat bubbles */}
+            <View style={styles.imageContainer}>
+              <Image source={images['user1']} style={styles.userImage} />
+              <Image source={images['user2']} style={styles.userImage} />
+              <Image source={images['user3']} style={styles.userImage} />
+            </View>
+            {/* Title */}
+            <Text style={styles.title}>Create Good Habits</Text>
+            <Text style={styles.subtitle}>
+              Change your life by slowly adding new healthy habits and sticking to them.
             </Text>
-          </TouchableOpacity>
-          <View style={styles.socialButtons}>
-            <TouchableOpacity style={styles.socialButton}>
-              <FontAwesome name="apple" size={24} color="black" />
+            {/* Login Buttons */}
+            <TouchableOpacity style={styles.emailButton} onPress={() => router.push('/sign-in')} >
+              <FontAwesome name="envelope" size={20} color="#000" />
+              <Text style={styles.emailText}>
+                Continue with E-mail
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton}>
-              <FontAwesome name="google" size={24} color="red" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton}>
-              <FontAwesome name="facebook" size={24} color="blue" />
-            </TouchableOpacity>
+            <View style={styles.socialButtons}>
+              <TouchableOpacity style={styles.socialButton}>
+                <FontAwesome name="apple" size={24} color="black" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.socialButton}>
+                <FontAwesome name="google" size={24} color="red" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.socialButton}>
+                <FontAwesome name="facebook" size={24} color="blue" />
+              </TouchableOpacity>
+            </View>
+            {/* Terms & Privacy */}
+            <Text style={styles.termsText}>By continuing you agree to Terms of Services & Privacy Policy</Text>
           </View>
-          {/* Terms & Privacy */}
-          <Text style={styles.termsText}>By continuing you agree to Terms of Services & Privacy Policy</Text>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </LinearGradient>
     </SafeAreaView>
   )
 }

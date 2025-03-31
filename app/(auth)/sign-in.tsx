@@ -3,7 +3,6 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView 
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Store token
 
 const API_URL = "http://127.0.0.1:8000"; // Your FastAPI server
 
@@ -80,11 +79,6 @@ const signIn = () => {
                         onChangeText={setPassword}
                         secureTextEntry
                     />
-
-                    {/* Forgot Password */}
-                    <TouchableOpacity>
-                        <Text style={styles.forgotPassword}>I forgot my password</Text>
-                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.nextContainer}>
