@@ -53,17 +53,6 @@ const OnBoradingScreen = () => {
                 Continue with E-mail
               </Text>
             </TouchableOpacity>
-            <View style={styles.socialButtons}>
-              <TouchableOpacity style={styles.socialButton}>
-                <FontAwesome name="apple" size={24} color="black" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.socialButton}>
-                <FontAwesome name="google" size={24} color="red" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.socialButton}>
-                <FontAwesome name="facebook" size={24} color="blue" />
-              </TouchableOpacity>
-            </View>
             {/* Terms & Privacy */}
             <Text style={styles.termsText}>By continuing you agree to Terms of Services & Privacy Policy</Text>
           </View>
