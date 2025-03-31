@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = "http://127.0.0.1:8000"; // Your FastAPI server
+const API_URL = Platform.select({
+    android: 'http://10.0.2.2:8000', // Android emulator
+    ios: 'http://localhost:8000',     // iOS simulator
+    default: 'http://127.0.0.1:8000', // Local development
+});
 
 const signIn = () => {
     const [email, setEmail] = useState('');
@@ -33,9 +38,8 @@ const signIn = () => {
             }
 
             // Store token
-            await localStorage.setItem("token", data.access_token);
+            await AsyncStorage.setItem("token", data.access_token);
 
-        
             router.push("/(auth)/HabitScreen"); // Redirect after login
 
         } catch (error) {

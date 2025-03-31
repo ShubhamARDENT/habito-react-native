@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, FlatList, ActivityIndicator } from 'react-native';
-import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
-import 'react-circular-progressbar/dist/styles.css';
-import AntDesign from '@expo/vector-icons/AntDesign';
+import { StyleSheet, Text, View, ActivityIndicator, Platform } from 'react-native';
 import HabitCards from './HabitCards';
 
-
-
-
+const API_URI = Platform.select({
+    ios: 'http://localhost:8000/api/v1/habits',
+    android: 'http://10.0.2.2:8000/api/v1/habits',
+    default: 'http://127.0.0.1:8000/api/v1/habits',
+});
 
 const Habits = () => {
     const [habits, setHabits] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const API_URI = "http://127.0.0.1:8000/api/v1/habits"
     useEffect(() => {
         const fetchHabits = async () => {
             try {
@@ -30,15 +28,11 @@ const Habits = () => {
         fetchHabits();
     }, []);
 
-
-
-
     if (loading) {
         return <ActivityIndicator size="large" color="blue" />;
     }
 
     const handleDeleteHabits = async (habits_id: string) => {
-
         try {
             const response = await fetch(`${API_URI}/${habits_id}`, {
                 method: "DELETE",
@@ -51,10 +45,8 @@ const Habits = () => {
         } catch (error) {
             console.error("Error fetching habits:", error);
         }
+    };
 
-    }
-    console.log(habits)
- 
     return (
         <View style={styles.container}>
             <View style={styles.header_view}>
@@ -102,9 +94,4 @@ const styles = StyleSheet.create({
         letterSpacing: 0.2,
         color: "#3843FF",
     },
-
-
-
-
-
 });

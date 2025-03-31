@@ -17,9 +17,8 @@ const habits = [
     { id: 8, name: 'Sleep well', emoji: '😴' },
 ];
 
-
 const HabitSelectionScreen = () => {
-    const [selectedHabits, setSelectedHabits] = useState([]);
+    const [selectedHabits, setSelectedHabits] = useState<number[]>([]);
 
     const toggleHabit = (id: number) => {
         setSelectedHabits((prev) =>
@@ -50,7 +49,7 @@ const HabitSelectionScreen = () => {
                 ))}
             </View>
 
-            <TouchableOpacity style={styles.nextButton} onPress={() => router.push("/(Tabs)/")}>
+            <TouchableOpacity style={styles.nextButton} onPress={() => router.push("/(tabs)")}>
                 <Text style={styles.nextButtonText}>Next</Text>
             </TouchableOpacity>
         </View>

@@ -1,24 +1,26 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
+interface HabitCardsProps {
+    handleDeleteHabits: (habits_id: string) => Promise<void>;
+    item: any;
+}
 
-
-const HabitCards = ({ handleDeleteHabits, item }: { handleDeleteHabits: (habits_id: string) => Promise<void> }) => {
+const HabitCards = ({ handleDeleteHabits, item }: HabitCardsProps) => {
     return (
         <View style={styles.card}>
             {/* Left Section with Icon and Progress */}
             <View style={styles.leftSection}>
                 <View style={styles.progressContainer}>
                     <View style={styles.progressWrapper}>
-                        <CircularProgressbar
-                            value={item.progress || 0} // Use actual habit progress
-                            styles={buildStyles({
-                                textSize: "0px",
-                                pathColor: "blue",
-                                trailColor: "#e0e0e0",
-                            })}
+                        <AnimatedCircularProgress
+                            size={50}
+                            width={3}
+                            fill={item.progress || 0}
+                            tintColor="#2B2BEF"
+                            backgroundColor="#e0e0e0"
                         />
                         <View style={styles.iconContainer}>
                             <Text style={styles.emoji}>{item.selectedIcon}</Text>
@@ -31,7 +33,7 @@ const HabitCards = ({ handleDeleteHabits, item }: { handleDeleteHabits: (habits_
                 </View>
             </View>
 
-            {/* Right Section with Friends & Add Button */}
+            {/* Right Section */}
             <View style={styles.rightSection}>
                 <View style={styles.avatarContainer}>
                     <View style={styles.moreFriends}>
@@ -39,7 +41,10 @@ const HabitCards = ({ handleDeleteHabits, item }: { handleDeleteHabits: (habits_
                     </View>
                 </View>
 
-                <TouchableOpacity style={styles.removeButton} onPress={() => handleDeleteHabits(item?._id.toString())}>
+                <TouchableOpacity 
+                    style={styles.removeButton} 
+                    onPress={() => handleDeleteHabits(item?._id.toString())}
+                >
                     <AntDesign name="delete" size={20} color="white" />
                 </TouchableOpacity>
             </View>

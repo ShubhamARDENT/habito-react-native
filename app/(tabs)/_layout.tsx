@@ -1,39 +1,36 @@
-import React from 'react';
 import { Tabs } from 'expo-router';
-import TabBar from '../tabBar/TabBar';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 
-
-const TabsLayout = () => {
-    return (
-        <Tabs tabBar={props => <TabBar {...props} />} screenOptions={{
-            headerShown: false
-        }}>
-            <Tabs.Screen
-                name="index"
-                options={{
-                    title: "Home",
-                    headerShown: false
-                }}
-            />
-            <Tabs.Screen
-                name="compass"
-                options={{
-                    title: "Compass",
-                    headerShown: false,
-                }}
-            />
-            <Tabs.Screen
-                name="create"
-                options={{
-                    title: "Create",
-                    headerShown: false,
-                }}
-            />
-         
-
-        </Tabs>
-    );
-};
-
-export default TabsLayout;
+export default function TabLayout() {
+  return (
+    <Tabs>
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="habitForm"
+        options={{
+          title: 'Add Habit',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="add-circle" size={size} color={color} />
+          ),
+        }}
+      />
+    </Tabs>
+  );
+}
