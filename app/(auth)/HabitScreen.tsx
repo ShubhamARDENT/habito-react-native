@@ -1,12 +1,11 @@
 import { AppDispatch, RootState } from '../../store/store';
-import { addToSelectedHabitList, SeletedHabit, setHabitList, setHabitLoading, setSelectedHabitList } from '../../store/habitSlice';
+import { setHabitList, setHabitLoading, setSelectedHabitList } from '../../store/habitSlice';
 import { router } from 'expo-router';
 
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadToken } from '@/store/authSlice';
-import { Habit } from './types';
 
 const API_URL = Platform.select({
     android: 'http://10.0.2.2:8000', // Android emulator
@@ -64,7 +63,6 @@ const HabitSelectionScreen = () => {
                 throw new Error(data.detail || "Login failed");
             }
 
-            console.log("Selected Habits:", data);
             dispatch(setSelectedHabitList(data));
         } catch (error) {
             Alert.alert("Login Failed", error instanceof Error ? error.message : "An unknown error occurred");
