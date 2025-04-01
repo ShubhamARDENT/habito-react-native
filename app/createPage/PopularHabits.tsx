@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
 import { setHabitList, setSelectedHabitList } from '@/store/habitSlice';
 import { router } from 'expo-router';
-import { fetchUserHabits } from '@/services/api';
+import { fetchHabitData, fetchUserHabits } from '@/services/api';
 interface Habit {
     _id?: string;
     id?: string;
@@ -35,18 +35,13 @@ const PopularHabits = () => {
     const { userId } = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(`${API_URL}/api/v1/habits/${userId}`);
-                const data = await response.json();
-                dispatch(setHabitList(data.data)); // ✅ Set habitList with fetched data
-            } catch (error) {
-                console.error("Error fetching habits:", error);
-            }
-        };
-
         fetchData();
     }, [])
+
+    const fetchData = async () => {
+        const data = await fetchHabitData(userId);
+        dispatch(setHabitList(data?.data));
+    }
 
     const addHabitToBackend = async (habit: Habit): Promise<void> => {
         try {
@@ -89,7 +84,6 @@ const PopularHabits = () => {
                     data={habitList}
                     keyExtractor={(item) => item.selectedIcon}
                     numColumns={2}
-                    scrollEnabled={true}
                     columnWrapperStyle={styles.card_main}
                     renderItem={({ item }) => (
                         <TouchableOpacity
@@ -113,7 +107,9 @@ export default PopularHabits;
 
 const styles = StyleSheet.create({
     popular_habits_main: {
+        flex: 1,
         marginTop: 20,
+        paddingHorizontal: 10,
     },
     successMessage: {
         backgroundColor: "#D4EDDA",
@@ -133,7 +129,8 @@ const styles = StyleSheet.create({
         letterSpacing: 0.4,
     },
     card_main: {
-        justifyContent: "space-evenly",
+        justifyContent: "space-between",
+        paddingHorizontal: 5,
     },
     card: {
         marginTop: 10,

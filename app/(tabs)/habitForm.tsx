@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Switch, Modal, FlatList } from "react-native";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Switch, Modal, FlatList, Platform } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from "expo-router";
+import { AppDispatch, RootState } from "@/store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { setHabitList } from "@/store/habitSlice";
 
 const availableIcons = ["🚶‍♀️", "🏃‍♂️", "🚴‍♀️", "🏊‍♂️", "🧘‍♀️", "🏋️‍♂️", "🎨", "🎸"];
 const daysOfWeek = [
@@ -14,13 +17,14 @@ const daysOfWeek = [
     { label: "S", value: "Sun" },
 ];
 
+const API_URL = Platform.select({
+    android: 'http://10.0.2.2:8000', // Android emulator
+    ios: 'http://localhost:8000',     // iOS simulator
+    default: 'http://127.0.0.1:8000', // Local development
+});
+
 const HabitForm = () => {
     const router = useRouter();
-    const [habits, setHabits] = useState<any[]>([]);
-
-
-
-
     const [habitData, setHabitData] = useState({
         habitName: "Walking",
         habitType: "Build",
@@ -34,6 +38,9 @@ const HabitForm = () => {
         iconModalVisible: false,
         goalModalVisible: false
     });
+    const dispatch = useDispatch<AppDispatch>();
+    const { userId } = useSelector((state: RootState) => state.auth);
+    const { habitList } = useSelector((state: RootState) => state.habit);
 
     const handleChange = (key: string, value: any) => {
         setHabitData((prev) => ({ ...prev, [key]: value }));
@@ -50,7 +57,7 @@ const HabitForm = () => {
 
     const handleCreateHabit = async () => {
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/v1/habits", {
+            const response = await fetch(`${API_URL}/api/v1/habits/${userId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -65,7 +72,7 @@ const HabitForm = () => {
             const newHabit = await response.json();
 
             // Update state with the new habit
-            setHabits((prev) => [...prev, newHabit]);
+            dispatch(setHabitList([...habitList, newHabit]));
 
             // Reset the form
             setHabitData({

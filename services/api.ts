@@ -17,3 +17,13 @@ export const fetchUserHabits = async (userId: string) => {
         return { success: false, error };
     }
 };
+
+export const fetchHabitData = async (userId: string) => {
+    try {
+        const response = await fetch(`${API_URI}/api/v1/habits/${userId}`);
+        const data = await response.json();
+        return { success: true, data: data.data };
+    } catch (error) {
+        console.error("Error fetching habits:", error);
+    }
+};
