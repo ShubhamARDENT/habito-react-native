@@ -62,7 +62,7 @@ const Habits = () => {
         <View style={styles.container}>
             <View style={styles.header_view}>
                 <Text style={styles.header}>Habits</Text>
-                <Text style={styles.view}>VIEW ALL</Text>
+                {/* <Text style={styles.view}>VIEW ALL</Text> */}
             </View>
 
             {selectedHabitList?.length > 0 && selectedHabitList?.map((item) => (
@@ -90,13 +90,13 @@ const styles = StyleSheet.create({
     },
     header_view: {
         flexDirection: "row",
-        justifyContent: "space-between",
+        justifyContent: "center",
         alignItems: "center",
         marginBottom: 10,
     },
     header: {
-        fontSize: 18,
-        fontWeight: "600",
+        fontSize: 20,
+        fontWeight: "900",
         letterSpacing: 0.6,
     },
     view: {

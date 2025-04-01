@@ -1,14 +1,5 @@
 import React from 'react'
-import { View, Text } from 'react-native'
-
-const CreatePage = () => {
-    return (
-        <View>
-            <Text>Create a new habit</Text>
-            {/* Rest of your create page content */}
-        </View>
-    )
-}
+import CreatePage from '../createPage'
 
 const Create = () => {
     return <CreatePage />
