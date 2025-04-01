@@ -415,6 +415,7 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
         flex: 1,
+        display: 'flex',
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "rgba(0,0,0,0.5)",
@@ -423,7 +424,7 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
         padding: 20,
         borderRadius: 10,
-        width: "80%",
+        width: "95%",
     },
     modalTitle: {
         fontSize: 18,
