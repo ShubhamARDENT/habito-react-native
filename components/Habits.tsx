@@ -15,7 +15,7 @@ const API_URI = Platform.select({
 const Habits = () => {
     const [loading, setLoading] = useState(true);
     const dispatch = useDispatch<AppDispatch>();
-    const { selectedHabitList } = useSelector((state: RootState) => state.habit);
+    const { selectedHabitList, selectedDay } = useSelector((state: RootState) => state.habit);
     const userId = useSelector((state: RootState) => state.auth.userId);
 
     useEffect(() => {
@@ -62,7 +62,7 @@ const Habits = () => {
             </View>
 
             {selectedHabitList?.length > 0 && selectedHabitList?.map(({ id, habit_details }) => (
-                id ? (
+                id ? (habit_details.selectedDays.includes(selectedDay) &&
                     <HabitCards key={id} item={habit_details} handleDeleteHabits={handleDeleteHabits} />
                 ) : (
                     <Text key={`invalid`} style={{ color: "red" }}>Invalid habit data</Text>

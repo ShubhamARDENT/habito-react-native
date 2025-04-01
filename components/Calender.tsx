@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import dayjs from "dayjs";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { updateSelectedDate } from "@/store/habitSlice";
 
 const CalendarStrip = () => {
-    const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD"));
+    const dispatch = useDispatch<AppDispatch>();
+    const { selectedDate } = useSelector((state: RootState) => state.habit);
 
     const dates = Array.from({ length: 30 }, (_, i) =>
         dayjs().add(i, "day").format("YYYY-MM-DD")
@@ -20,7 +24,7 @@ const CalendarStrip = () => {
                     const isSelected = item === selectedDate;
                     return (
                         <TouchableOpacity
-                            onPress={() => setSelectedDate(item)}
+                            onPress={() => dispatch(updateSelectedDate(item))}
                             style={[styles.dateContainer, isSelected && styles.selectedDate]}
                         >
                             <Text style={[styles.dateText, isSelected && styles.selectedDateText]}>

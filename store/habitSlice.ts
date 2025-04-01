@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppDispatch } from "./store";
+import dayjs from "dayjs";
 
 interface Habit {
     _id?: string;
@@ -41,12 +42,16 @@ interface HabitState {
     habitList: Habit[];
     selectedHabitList: SeletedHabit[];
     loading: boolean;
+    selectedDate: string;
+    selectedDay: string;
 }
 
 const initialState: HabitState = {
     habitList: [],
     selectedHabitList: [],
     loading: false,
+    selectedDate: dayjs().format("YYYY-MM-DD"),
+    selectedDay: dayjs().format("dddd"), // Gets the current day name
 };
 
 const habitSlice = createSlice({
@@ -74,10 +79,26 @@ const habitSlice = createSlice({
         setHabitLoading(state, action: PayloadAction<boolean>) {
             state.loading = action.payload;
         },
+        setSelectedDate(state, action: PayloadAction<string>) {
+            state.selectedDate = action.payload;
+        },
+        setSelectedDay(state, action: PayloadAction<string>) {
+            state.selectedDay = action.payload;
+        },
     },
 });
 
-export const { setHabits, setHabitLoading, addHabits, removeHabits, setSelectedHabits, addSelectedHabitList, removeSelectedHabitList } = habitSlice.actions;
+export const { 
+    setHabits, 
+    setHabitLoading, 
+    addHabits, 
+    removeHabits, 
+    setSelectedHabits, 
+    addSelectedHabitList, 
+    removeSelectedHabitList,
+    setSelectedDate,
+    setSelectedDay 
+} = habitSlice.actions;
 
 export const setHabitList = (habits: Habit[]) => async (dispatch: AppDispatch) => {
     try {
@@ -124,6 +145,16 @@ export const removeFromSelectedHabitList = (habit: Habit) => async (dispatch: Ap
         dispatch(removeSelectedHabitList(habit));
     } catch (error) {
         console.error("Error removing habit:", error);
+    }
+};
+
+export const updateSelectedDate = (date: string) => async (dispatch: AppDispatch) => {
+    try {
+        dispatch(setSelectedDate(date));
+        // Also update the day when date changes
+        dispatch(setSelectedDay(dayjs(date).format("dddd")));
+    } catch (error) {
+        console.error("Error setting selected date:", error);
     }
 };
 
