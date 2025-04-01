@@ -2,8 +2,9 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Platform } from 're
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
-import { setHabitList } from '@/store/habitSlice';
+import { setHabitList, setSelectedHabitList } from '@/store/habitSlice';
 import { router } from 'expo-router';
+import { fetchUserHabits } from '@/services/api';
 interface Habit {
     _id?: string;
     id?: string;
@@ -56,6 +57,7 @@ const PopularHabits = () => {
             if (response.ok) {
                 setSelectedHabit(habit.selectedIcon);
                 setMessage(`✅ "${habit.habitName}" has been added! 🎉`);
+                fetchSelectedHabits();
                 router.push('/(tabs)'); // ✅ Navigate to home after adding habit
             } else {
                 setMessage("❌ Failed to add habit. Please try again.");
@@ -63,6 +65,17 @@ const PopularHabits = () => {
         } catch (error) {
             console.error("Error posting habit:", error);
             setMessage("❌ Error: Check your connection.");
+        }
+    };
+
+    const fetchSelectedHabits = async () => {
+        try {
+            const result = await fetchUserHabits(userId);
+            if (result.success) {
+                dispatch(setSelectedHabitList(result.data));
+            }
+        } catch (error) {
+            console.error("Error fetching habits:", error);
         }
     };
 

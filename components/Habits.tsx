@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import HabitCards from './HabitCards';
 import { AppDispatch, RootState } from '@/store/store';
 import { SeletedHabit, setSelectedHabitList } from '@/store/habitSlice';
+import { fetchUserHabits } from '@/services/api';
 
 const API_URI = Platform.select({
     ios: 'http://localhost:8000',
@@ -23,10 +24,10 @@ const Habits = () => {
 
     const fetchSelectedHabits = async () => {
         try {
-            const response = await fetch(`${API_URI}/api/v1/habits/${userId}/selected`);
-            const addedHabit = await response.json();
-            
-            dispatch(setSelectedHabitList(addedHabit.data));
+            const result = await fetchUserHabits(userId);
+            if (result.success) {
+                dispatch(setSelectedHabitList(result.data));
+            }
         } catch (error) {
             console.error("Error fetching habits:", error);
         } finally {
@@ -46,8 +47,7 @@ const Habits = () => {
             });
 
             if (response.ok) {
-                // Update state to remove the deleted habit
-                dispatch(setSelectedHabitList(selectedHabitList.filter((habit) => habit.id !== habits_id)));
+                fetchSelectedHabits()
             }
         } catch (error) {
             console.error("Error fetching habits:", error);
