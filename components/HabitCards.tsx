@@ -23,21 +23,21 @@ const HabitCards = ({ handleDeleteHabits, item }: HabitCardsProps) => {
                             backgroundColor="#e0e0e0"
                         />
                         <View style={styles.iconContainer}>
-                            {item.emoji?.startsWith('http') ? (
+                            {item.selectedIcon?.startsWith('http') ? (
                                 <Image 
-                                    source={{ uri: item.emoji }} 
+                                    source={{ uri: item.selectedIcon }} 
                                     style={styles.emojiImage} 
                                 />
                             ) : (
-                                <Text style={styles.emojiText}>
-                                    {item.emoji}
+                                <Text style={styles.selectedIconText}>
+                                    {item.selectedIcon}
                                 </Text>
                             )}
                         </View>
                     </View>
                 </View>
                 <View>
-                    <Text style={styles.title}>{item.title}</Text>
+                    <Text style={styles.habitName}>{item.habitName}</Text>
                 </View>
             </View>
 
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
         paddingVertical: 6,
         borderRadius: 8,
     },
-    emoji: {
+    selectedIcon: {
         fontSize: 20,
     },
     emojiImage: {
@@ -77,13 +77,13 @@ const styles = StyleSheet.create({
         height: 20,
         resizeMode: 'contain',
     },
-    emojiText: {
+    selectedIconText: {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         fontSize: 20,
     },
-    title: {
+    habitName: {
         fontSize: 16,
         fontWeight: "bold",
         color: "#000",

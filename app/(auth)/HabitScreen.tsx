@@ -1,5 +1,5 @@
 import { AppDispatch, RootState } from '../../store/store';
-import { setHabitList, setHabitLoading } from '../../store/habitSlice';
+import { addToSelectedHabitList, setHabitList, setHabitLoading } from '../../store/habitSlice';
 import { router } from 'expo-router';
 
 import React, { useEffect, useState } from 'react';
@@ -13,7 +13,7 @@ const API_URL = Platform.select({
 });
 
 const HabitSelectionScreen = () => {
-    const [selectedHabits, setSelectedHabits] = useState<number[]>([]);
+    const [selectedHabits, setSelectedHabits] = useState<string>('');
     const dispatch = useDispatch<AppDispatch>();
 
     const { userId, token } = useSelector((state: RootState) => state.auth);
@@ -45,11 +45,35 @@ const HabitSelectionScreen = () => {
         }
     }
 
-    const toggleHabit = (id: number) => {
-        setSelectedHabits((prev) =>
-            prev.includes(id) ? prev.filter((habitId) => habitId !== id) : [...prev, id]
-        );
+    const toggleHabit = async (id: string) => {
+        setSelectedHabits(id);
     };
+
+    const handleNextButtonPress = async () => {
+        try {
+            const response = await fetch(`${API_URL}/api/v1/habits/${userId}/selected/${selectedHabits}`, {
+                method: "POST",
+            });
+
+            const data = await response.json();
+            
+            if (!response?.ok) {
+                throw new Error(data.detail || "Login failed");
+            }
+
+            console.log("Selected Habits:", data);
+            
+            const selectedHabit = habitList.find((oneHabit) => oneHabit._id === data.habit_id);
+            if (selectedHabit) {
+                dispatch(addToSelectedHabitList(selectedHabit));
+            } else {
+                console.error("Selected habit not found in the habit list.");
+            }
+        } catch (error) {
+            Alert.alert("Login Failed", error instanceof Error ? error.message : "An unknown error occurred");
+        }
+        router.push("/(tabs)")
+    }
 
     return (
         <View style={styles.container}>
@@ -59,10 +83,10 @@ const HabitSelectionScreen = () => {
             <View style={styles.grid}>
                 {habitList?.length > 0 && habitList?.map((habit) => (
                     <TouchableOpacity
-                        key={habit.id}
-                        style={[styles.card, selectedHabits.includes(parseInt(habit.id)) &&
+                        key={habit._id}
+                        style={[styles.card, selectedHabits === habit._id &&
                             styles.selectedCard]}
-                        onPress={() => toggleHabit(parseInt(habit.id))}
+                        onPress={() => toggleHabit(habit._id ?? '')}
                     >
                         <Text style={styles.emoji}>{habit.selectedIcon}</Text>
                         <Text style={styles.cardText}>{habit.habitName}</Text>
@@ -70,7 +94,7 @@ const HabitSelectionScreen = () => {
                 ))}
             </View>
 
-            <TouchableOpacity style={styles.nextButton} onPress={() => router.push("/(tabs)")}>
+            <TouchableOpacity style={styles.nextButton} onPress={handleNextButtonPress}>
                 <Text style={styles.nextButtonText}>Next</Text>
             </TouchableOpacity>
         </View>

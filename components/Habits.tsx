@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator, Platform } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import HabitCards from './HabitCards';
-import { RootState } from '@/store/store';
+import { AppDispatch, RootState } from '@/store/store';
+import { setSelectedHabitList } from '@/store/habitSlice';
 
 const API_URI = Platform.select({
     ios: 'http://localhost:8000',
@@ -15,26 +16,28 @@ const Habits = () => {
         _id: string;
         [key: string]: any; // Add other properties as needed
     }
-
-    const [habits, setHabits] = useState<Habit[]>([]);
     const [loading, setLoading] = useState(true);
+    const dispatch = useDispatch<AppDispatch>();
+    const { selectedHabitList } = useSelector((state: RootState) => state.habit);
     const userId = useSelector((state: RootState) => state.auth.userId);
 
     useEffect(() => {
-        const fetchHabits = async () => {
-            try {
-                const response = await fetch(`${API_URI}/api/v1/${userId}/habits`);
-                const addedHabit = await response.json();
-                setHabits(addedHabit.data);
-            } catch (error) {
-                console.error("Error fetching habits:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchHabits();
+        fetchSelectedHabits();
     }, [userId]);
+
+    const fetchSelectedHabits = async () => {
+        try {
+            const response = await fetch(`${API_URI}/api/v1/habits/${userId}/selected`);
+            const addedHabit = await response.json();
+            const sendData = addedHabit.data.map((habit: Habit) => habit.habit_details)
+            
+            dispatch(setSelectedHabitList(sendData));
+        } catch (error) {
+            console.error("Error fetching habits:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     if (loading) {
         return <ActivityIndicator size="large" color="blue" />;
@@ -42,13 +45,13 @@ const Habits = () => {
 
     const handleDeleteHabits = async (habits_id: string) => {
         try {
-            const response = await fetch(`${API_URI}/${habits_id}`, {
+            const response = await fetch(`${API_URI}/habits/${userId}/${habits_id}`, {
                 method: "DELETE",
             });
 
             if (response.ok) {
                 // Update state to remove the deleted habit
-                setHabits(habits.filter((habit) => habit._id !== habits_id));
+                dispatch(setSelectedHabitList(selectedHabitList.filter((habit) => habit._id !== habits_id)));
             }
         } catch (error) {
             console.error("Error fetching habits:", error);
@@ -62,9 +65,9 @@ const Habits = () => {
                 <Text style={styles.view}>VIEW ALL</Text>
             </View>
 
-            {habits?.map((item) => (
-                item?._id ? (
-                    <HabitCards key={item._id.toString()} item={item} handleDeleteHabits={handleDeleteHabits} />
+            {selectedHabitList?.length > 0 && selectedHabitList?.map((item) => (
+                item?.id ? (
+                    <HabitCards key={item.id.toString()} item={item} handleDeleteHabits={handleDeleteHabits} />
                 ) : (
                     <Text key={`invalid`} style={{ color: "red" }}>Invalid habit data</Text>
                 )

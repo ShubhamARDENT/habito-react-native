@@ -2,7 +2,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppDispatch } from "./store";
 
 interface Habit {
-    id: string;
+    _id?: string;
+    id?: string;
     habitName: string;
     habitType: "Build" | "Break";
     selectedIcon: string;
@@ -17,11 +18,13 @@ interface Habit {
 
 interface HabitState {
     habitList: Habit[];
+    selectedHabitList: Habit[];
     loading: boolean;
 }
 
 const initialState: HabitState = {
     habitList: [],
+    selectedHabitList: [],
     loading: false,
 };
 
@@ -36,7 +39,16 @@ const habitSlice = createSlice({
             if (action.payload) state.habitList = [...state.habitList, action.payload];
         },
         removeHabits(state, action: PayloadAction<Habit | null>) {
-            if (action.payload) state.habitList = state.habitList.filter((habit) => habit.habitName !== action.payload?.habitName);
+            if (action.payload) state.habitList = state.habitList.filter((habit) => habit._id !== action.payload?._id);
+        },
+        setSelectedHabits(state, action: PayloadAction<Habit[] | null>) {
+            state.selectedHabitList = action.payload || [];
+        },
+        addSelectedHabitList(state, action: PayloadAction<Habit | null>) {
+            if (action.payload) state.selectedHabitList = [...state.selectedHabitList, action.payload];
+        },
+        removeSelectedHabitList(state, action: PayloadAction<Habit | null>) {
+            if (action.payload) state.selectedHabitList = state.selectedHabitList.filter((habit) => habit._id !== action.payload?._id);
         },
         setHabitLoading(state, action: PayloadAction<boolean>) {
             state.loading = action.payload;
@@ -44,7 +56,7 @@ const habitSlice = createSlice({
     },
 });
 
-export const { setHabits, setHabitLoading, addHabits, removeHabits } = habitSlice.actions;
+export const { setHabits, setHabitLoading, addHabits, removeHabits, setSelectedHabits, addSelectedHabitList, removeSelectedHabitList } = habitSlice.actions;
 
 export const setHabitList = (habits: Habit[]) => async (dispatch: AppDispatch) => {
     try {
@@ -65,6 +77,30 @@ export const addToHabitList = (habit: Habit) => async (dispatch: AppDispatch) =>
 export const removeFromHabitList = (habit: Habit) => async (dispatch: AppDispatch) => {
     try {
         dispatch(removeHabits(habit));
+    } catch (error) {
+        console.error("Error removing habit:", error);
+    }
+};
+
+export const setSelectedHabitList = (habits: Habit[]) => async (dispatch: AppDispatch) => {
+    try {
+        dispatch(setSelectedHabits(habits));
+    } catch (error) {
+        console.error("Error setting habits:", error);
+    }
+};
+
+export const addToSelectedHabitList = (habit: Habit) => async (dispatch: AppDispatch) => {
+    try {
+        dispatch(addSelectedHabitList(habit));
+    } catch (error) {
+        console.error("Error adding habit:", error);
+    }
+};
+
+export const removeFromSelectedHabitList = (habit: Habit) => async (dispatch: AppDispatch) => {
+    try {
+        dispatch(removeSelectedHabitList(habit));
     } catch (error) {
         console.error("Error removing habit:", error);
     }
