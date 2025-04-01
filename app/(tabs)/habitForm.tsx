@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { AppDispatch, RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";
 import { setHabitList } from "@/store/habitSlice";
+import { fetchHabitData } from "@/services/api";
 
 const availableIcons = ["🚶‍♀️", "🏃‍♂️", "🚴‍♀️", "🏊‍♂️", "🧘‍♀️", "🏋️‍♂️", "🎨", "🎸"];
 const daysOfWeek = [
@@ -70,9 +71,8 @@ const HabitForm = () => {
             }
 
             const newHabit = await response.json();
-
             // Update state with the new habit
-            dispatch(setHabitList([...habitList, newHabit]));
+            dispatch(setHabitList([...habitList, newHabit.habit]));
 
             // Reset the form
             setHabitData({
@@ -88,11 +88,18 @@ const HabitForm = () => {
                 iconModalVisible: false,
                 goalModalVisible: false,
             });
+
+            fetchData();
+            router.push("/(tabs)/create");
         } catch (error) {
             console.error("Error adding habit:", error);
         }
     };
 
+    const fetchData = async () => {
+        const data = await fetchHabitData(userId);
+        dispatch(setHabitList(data?.data));
+    }
 
     return (
         <View style={styles.container}>
