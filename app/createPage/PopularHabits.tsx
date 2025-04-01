@@ -1,105 +1,62 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Platform } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/store/store';
+import { setHabitList } from '@/store/habitSlice';
+import { router } from 'expo-router';
+interface Habit {
+    _id?: string;
+    id?: string;
+    habitName: string;
+    habitType: "Build" | "Break";
+    selectedIcon: string;
+    goalCount: string;
+    goalFrequency: string;
+    goalDays: string;
+    selectedDays: string[];
+    reminderEnabled: boolean;
+    reminderTime: string;
+    is_active: boolean;
+}
 
-// ✅ Predefined Template Habits (Matches Custom Habit Format)
-const templateHabits =
-    [
-        {
-
-            "habitName": "Reading",
-            "habitType": "Build",
-            "selectedIcon": "📖",
-            "goalCount": "10",
-            "goalFrequency": "Daily",
-            "goalDays": "Everyday",
-            "selectedDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-            "reminderEnabled": true,
-            "reminderTime": "20:00"
-        },
-        {
-
-            "habitName": "Meditation",
-            "habitType": "Build",
-            "selectedIcon": "🧘",
-            "goalCount": "1",
-            "goalFrequency": "Daily",
-            "goalDays": "Weekdays",
-            "selectedDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-            "reminderEnabled": true,
-            "reminderTime": "07:00"
-        },
-        {
-
-            "habitName": "Junk Food",
-            "habitType": "Quit",
-            "selectedIcon": "🍔",
-            "goalCount": "0",
-            "goalFrequency": "Weekly",
-            "goalDays": "Weekend",
-            "selectedDays": ["Saturday", "Sunday"],
-            "reminderEnabled": false,
-            "reminderTime": "12:30"
-        },
-        {
-
-            "habitName": "Running",
-            "habitType": "Build",
-            "selectedIcon": "🏃",
-            "goalCount": "5",
-            "goalFrequency": "Weekly",
-            "goalDays": "Mon, Wed, Fri",
-            "selectedDays": ["Monday", "Wednesday", "Friday"],
-            "reminderEnabled": true,
-            "reminderTime": "06:30"
-        },
-        {
-
-            "habitName": "Social Media",
-            "habitType": "Quit",
-            "selectedIcon": "📱",
-            "goalCount": "1",
-            "goalFrequency": "Daily",
-            "goalDays": "Everyday",
-            "selectedDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-            "reminderEnabled": false,
-            "reminderTime": "10:30"
-        }
-    ]
-
-
-
-
-const API_URL = "http://127.0.0.1:8000/api/v1/habits"; 
+const API_URL = Platform.select({
+    android: 'http://10.0.2.2:8000', // Android emulator
+    ios: 'http://localhost:8000',     // iOS simulator
+    default: 'http://127.0.0.1:8000', // Local development
+});
 
 const PopularHabits = () => {
     const [selectedHabit, setSelectedHabit] = useState<string | null>(null);
     const [message, setMessage] = useState(""); // ✅ State for Success Message
+    const dispatch = useDispatch<AppDispatch>();
 
-    // ✅ Function to Add Habit to Backend
-    interface Habit {
-        habitName: string;
-        habitType: string;
-        selectedIcon: string;
-        goalCount: string;
-        goalFrequency: string;
-        goalDays: string;
-        selectedDays: string[];
-        reminderEnabled: boolean;
-        reminderTime: string;
-    }
+    const { habitList } = useSelector((state: RootState) => state.habit);
+    const { userId } = useSelector((state: RootState) => state.auth);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/habits/${userId}`);
+                const data = await response.json();
+                dispatch(setHabitList(data.data)); // ✅ Set habitList with fetched data
+            } catch (error) {
+                console.error("Error fetching habits:", error);
+            }
+        };
+
+        fetchData();
+    }, [])
 
     const addHabitToBackend = async (habit: Habit): Promise<void> => {
         try {
-            const response = await fetch(API_URL, {
+            const response = await fetch(`${API_URL}/api/v1/habits/${userId}/selected/${habit._id}`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(habit), // ✅ Sends complete habit object
             });
 
             if (response.ok) {
                 setSelectedHabit(habit.selectedIcon);
                 setMessage(`✅ "${habit.habitName}" has been added! 🎉`);
-                setTimeout(() => setMessage(""), 3000); // ✅ Remove message after 3s
+                router.push('/(tabs)'); // ✅ Navigate to home after adding habit
             } else {
                 setMessage("❌ Failed to add habit. Please try again.");
             }
@@ -111,29 +68,30 @@ const PopularHabits = () => {
 
     return (
         <View style={styles.popular_habits_main}>
-            {message ? <Text style={styles.successMessage}>{message}</Text> : null} {/* ✅ Show Message */}
-
+            {message ? <Text style={styles.successMessage}>{message}</Text> : null}
             <Text style={styles.header}>CHOOSE A Template HABIT</Text>
 
-            <FlatList
-                data={templateHabits}
-                keyExtractor={(item) => item.selectedIcon}
-                numColumns={2}
-                columnWrapperStyle={styles.card_main}
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={[styles.card, selectedHabit === item.selectedIcon && styles.selectedCard]}
-                        onPress={() => addHabitToBackend(item)}
-                    >
-                        <View style={styles.emoji_container}>
-                            <Text style={styles.emoji}>{item.selectedIcon}</Text>
-                        </View>
-                        <Text style={styles.title}>{item.habitName}</Text>
-                        <Text style={styles.subtitle}>{item.goalFrequency}</Text>
-                    </TouchableOpacity>
-                )}
-                showsVerticalScrollIndicator={false}
-            />
+            {habitList?.length > 0 && (
+                <FlatList
+                    data={habitList}
+                    keyExtractor={(item) => item.selectedIcon}
+                    numColumns={2}
+                    scrollEnabled={true}
+                    columnWrapperStyle={styles.card_main}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity
+                            style={[styles.card, selectedHabit === item.selectedIcon && styles.selectedCard]}
+                            onPress={() => addHabitToBackend(item)}
+                        >
+                            <View style={styles.emoji_container}>
+                                <Text style={styles.emoji}>{item.selectedIcon}</Text>
+                            </View>
+                            <Text style={styles.title}>{item.habitName}</Text>
+                            <Text style={styles.subtitle}>{item.goalFrequency}</Text>
+                        </TouchableOpacity>
+                    )}
+                />
+            )}
         </View>
     );
 };

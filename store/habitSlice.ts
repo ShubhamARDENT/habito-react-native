@@ -3,7 +3,6 @@ import { AppDispatch } from "./store";
 
 interface Habit {
     _id?: string;
-    id?: string;
     habitName: string;
     habitType: "Build" | "Break";
     selectedIcon: string;
@@ -16,9 +15,31 @@ interface Habit {
     is_active: boolean;
 }
 
+export interface SeletedHabit {
+    id: string;
+    habit_id: string;
+    user_id: string;
+    completed_at: string;
+    completion_count: number;
+    notes: string;
+    created_at: string;
+    habit_details: {
+        id: string;
+        habitName: string;
+        habitType: "Build" | "Break";
+        selectedIcon: string;
+        goalCount: string;
+        goalFrequency: string;
+        goalDays: string;
+        selectedDays: string[];
+        reminderEnabled: boolean;
+        reminderTime: string;
+    };
+}
+
 interface HabitState {
     habitList: Habit[];
-    selectedHabitList: Habit[];
+    selectedHabitList: SeletedHabit[];
     loading: boolean;
 }
 
@@ -41,14 +62,14 @@ const habitSlice = createSlice({
         removeHabits(state, action: PayloadAction<Habit | null>) {
             if (action.payload) state.habitList = state.habitList.filter((habit) => habit._id !== action.payload?._id);
         },
-        setSelectedHabits(state, action: PayloadAction<Habit[] | null>) {
+        setSelectedHabits(state, action: PayloadAction<SeletedHabit[] | null>) {
             state.selectedHabitList = action.payload || [];
         },
-        addSelectedHabitList(state, action: PayloadAction<Habit | null>) {
+        addSelectedHabitList(state, action: PayloadAction<SeletedHabit | null>) {
             if (action.payload) state.selectedHabitList = [...state.selectedHabitList, action.payload];
         },
         removeSelectedHabitList(state, action: PayloadAction<Habit | null>) {
-            if (action.payload) state.selectedHabitList = state.selectedHabitList.filter((habit) => habit._id !== action.payload?._id);
+            if (action.payload) state.selectedHabitList = state.selectedHabitList.filter((habit) => habit.id !== action.payload?._id);
         },
         setHabitLoading(state, action: PayloadAction<boolean>) {
             state.loading = action.payload;
@@ -82,7 +103,7 @@ export const removeFromHabitList = (habit: Habit) => async (dispatch: AppDispatc
     }
 };
 
-export const setSelectedHabitList = (habits: Habit[]) => async (dispatch: AppDispatch) => {
+export const setSelectedHabitList = (habits: SeletedHabit[]) => async (dispatch: AppDispatch) => {
     try {
         dispatch(setSelectedHabits(habits));
     } catch (error) {
@@ -90,7 +111,7 @@ export const setSelectedHabitList = (habits: Habit[]) => async (dispatch: AppDis
     }
 };
 
-export const addToSelectedHabitList = (habit: Habit) => async (dispatch: AppDispatch) => {
+export const addToSelectedHabitList = (habit: SeletedHabit) => async (dispatch: AppDispatch) => {
     try {
         dispatch(addSelectedHabitList(habit));
     } catch (error) {

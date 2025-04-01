@@ -51,7 +51,7 @@ const HabitCards = ({ handleDeleteHabits, item }: HabitCardsProps) => {
 
                 <TouchableOpacity 
                     style={styles.removeButton} 
-                    onPress={() => handleDeleteHabits(item?._id.toString())}
+                    onPress={() => handleDeleteHabits(item?.id)}
                 >
                     <AntDesign name="delete" size={20} color="white" />
                 </TouchableOpacity>

@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, ActivityIndicator, Platform } from 'react-nativ
 import { useDispatch, useSelector } from 'react-redux';
 import HabitCards from './HabitCards';
 import { AppDispatch, RootState } from '@/store/store';
-import { setSelectedHabitList } from '@/store/habitSlice';
+import { SeletedHabit, setSelectedHabitList } from '@/store/habitSlice';
 
 const API_URI = Platform.select({
     ios: 'http://localhost:8000',
@@ -12,10 +12,6 @@ const API_URI = Platform.select({
 });
 
 const Habits = () => {
-    interface Habit {
-        _id: string;
-        [key: string]: any; // Add other properties as needed
-    }
     const [loading, setLoading] = useState(true);
     const dispatch = useDispatch<AppDispatch>();
     const { selectedHabitList } = useSelector((state: RootState) => state.habit);
@@ -23,15 +19,14 @@ const Habits = () => {
 
     useEffect(() => {
         fetchSelectedHabits();
-    }, [userId]);
+    }, []);
 
     const fetchSelectedHabits = async () => {
         try {
             const response = await fetch(`${API_URI}/api/v1/habits/${userId}/selected`);
             const addedHabit = await response.json();
-            const sendData = addedHabit.data.map((habit: Habit) => habit.habit_details)
             
-            dispatch(setSelectedHabitList(sendData));
+            dispatch(setSelectedHabitList(addedHabit.data));
         } catch (error) {
             console.error("Error fetching habits:", error);
         } finally {
@@ -44,19 +39,27 @@ const Habits = () => {
     }
 
     const handleDeleteHabits = async (habits_id: string) => {
+        console.log("Deleting habit with ID:", habits_id);
+        console.log("selectedHabitList:", selectedHabitList);
+
+        const findId = selectedHabitList?.find((habit: SeletedHabit) => habits_id === habit?.habit_details?.id)?.id;
+        console.log("Finding ID:", findId);
+        
         try {
-            const response = await fetch(`${API_URI}/habits/${userId}/${habits_id}`, {
+            const response = await fetch(`${API_URI}/habits/${userId}/selected/${findId}`, {
                 method: "DELETE",
             });
 
             if (response.ok) {
                 // Update state to remove the deleted habit
-                dispatch(setSelectedHabitList(selectedHabitList.filter((habit) => habit._id !== habits_id)));
+                dispatch(setSelectedHabitList(selectedHabitList.filter((habit) => habit.id !== habits_id)));
             }
         } catch (error) {
             console.error("Error fetching habits:", error);
         }
     };
+
+    const habitData = selectedHabitList?.map((habit: SeletedHabit) => habit?.habit_details ?? null)
 
     return (
         <View style={styles.container}>
@@ -65,9 +68,9 @@ const Habits = () => {
                 {/* <Text style={styles.view}>VIEW ALL</Text> */}
             </View>
 
-            {selectedHabitList?.length > 0 && selectedHabitList?.map((item) => (
+            {habitData?.length > 0 && habitData?.map((item) => (
                 item?.id ? (
-                    <HabitCards key={item.id.toString()} item={item} handleDeleteHabits={handleDeleteHabits} />
+                    <HabitCards key={`${item.id.toString()}-${item.habitName}`} item={item} handleDeleteHabits={handleDeleteHabits} />
                 ) : (
                     <Text key={`invalid`} style={{ color: "red" }}>Invalid habit data</Text>
                 )
