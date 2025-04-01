@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import { loadToken } from '@/store/authSlice';
 
 const API_URL = Platform.select({
     android: 'http://10.0.2.2:8000', // Android emulator
@@ -21,6 +22,7 @@ const HabitSelectionScreen = () => {
 
     useEffect(() => {
         fetchHabits();
+        dispatch(loadToken())
     }, [])
 
     const fetchHabits = async () => {

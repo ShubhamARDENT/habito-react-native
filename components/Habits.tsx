@@ -39,14 +39,9 @@ const Habits = () => {
     }
 
     const handleDeleteHabits = async (habits_id: string) => {
-        console.log("Deleting habit with ID:", habits_id);
-        console.log("selectedHabitList:", selectedHabitList);
-
         const findId = selectedHabitList?.find((habit: SeletedHabit) => habits_id === habit?.habit_details?.id)?.id;
-        console.log("Finding ID:", findId);
-        
         try {
-            const response = await fetch(`${API_URI}/habits/${userId}/selected/${findId}`, {
+            const response = await fetch(`${API_URI}/api/v1/habits/${userId}/selected/${findId}`, {
                 method: "DELETE",
             });
 
@@ -59,8 +54,6 @@ const Habits = () => {
         }
     };
 
-    const habitData = selectedHabitList?.map((habit: SeletedHabit) => habit?.habit_details ?? null)
-
     return (
         <View style={styles.container}>
             <View style={styles.header_view}>
@@ -68,9 +61,9 @@ const Habits = () => {
                 {/* <Text style={styles.view}>VIEW ALL</Text> */}
             </View>
 
-            {habitData?.length > 0 && habitData?.map((item) => (
-                item?.id ? (
-                    <HabitCards key={`${item.id.toString()}-${item.habitName}`} item={item} handleDeleteHabits={handleDeleteHabits} />
+            {selectedHabitList?.length > 0 && selectedHabitList?.map(({ id, habit_details }) => (
+                id ? (
+                    <HabitCards key={id} item={habit_details} handleDeleteHabits={handleDeleteHabits} />
                 ) : (
                     <Text key={`invalid`} style={{ color: "red" }}>Invalid habit data</Text>
                 )
