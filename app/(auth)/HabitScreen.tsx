@@ -1,23 +1,49 @@
+import { AppDispatch, RootState } from '../../store/store';
+import { setHabitList, setHabitLoading } from '../../store/habitSlice';
 import { router } from 'expo-router';
 
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Platform, Alert } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 
-
-// * change the habits to template
-const habits = [
-    { id: 1, name: 'Drink water', emoji: '💧' },
-    { id: 2, name: 'Run', emoji: '🏃' },
-    { id: 3, name: 'Read books', emoji: '📖' },
-    { id: 4, name: 'Meditate', emoji: '🧘' },
-    { id: 5, name: 'Study', emoji: '👨‍🎓' },
-    { id: 6, name: 'Journal', emoji: '📕' },
-    { id: 7, name: 'Plant trees', emoji: '🌿' },
-    { id: 8, name: 'Sleep well', emoji: '😴' },
-];
+const API_URL = Platform.select({
+    android: 'http://10.0.2.2:8000', // Android emulator
+    ios: 'http://localhost:8000',     // iOS simulator
+    default: 'http://127.0.0.1:8000', // Local development
+});
 
 const HabitSelectionScreen = () => {
     const [selectedHabits, setSelectedHabits] = useState<number[]>([]);
+    const dispatch = useDispatch<AppDispatch>();
+
+    const { userId, token } = useSelector((state: RootState) => state.auth);
+    const { habitList } = useSelector((state: RootState) => state.habit);
+
+    useEffect(() => {
+        fetchHabits();
+    }, [])
+
+    const fetchHabits = async () => {
+        dispatch(setHabitLoading(true));
+        try {
+            const response = await fetch(`${API_URL}/api/v1/habits/${userId}`, {
+                method: "GET",
+                headers: { "Authorization": `Bearer ${token}` },
+            });
+
+            const data = await response.json();
+
+            if (!response?.ok) {
+                throw new Error(data.detail || "Login failed");
+            }
+            
+            dispatch(setHabitList(data.data));
+        } catch (error) {
+            Alert.alert("Login Failed", error instanceof Error ? error.message : "An unknown error occurred");
+        } finally {
+            dispatch(setHabitLoading(false));
+        }
+    }
 
     const toggleHabit = (id: number) => {
         setSelectedHabits((prev) =>
@@ -31,15 +57,15 @@ const HabitSelectionScreen = () => {
             <Text style={styles.subtitle}>You may add more habits later</Text>
 
             <View style={styles.grid}>
-                {habits.map((habit) => (
+                {habitList?.length > 0 && habitList?.map((habit) => (
                     <TouchableOpacity
                         key={habit.id}
-                        style={[styles.card, selectedHabits.includes(habit.id) &&
+                        style={[styles.card, selectedHabits.includes(parseInt(habit.id)) &&
                             styles.selectedCard]}
-                        onPress={() => toggleHabit(habit.id)}
+                        onPress={() => toggleHabit(parseInt(habit.id))}
                     >
-                        <Text style={styles.emoji}>{habit.emoji}</Text>
-                        <Text style={styles.cardText}>{habit.name}</Text>
+                        <Text style={styles.emoji}>{habit.selectedIcon}</Text>
+                        <Text style={styles.cardText}>{habit.habitName}</Text>
                     </TouchableOpacity>
                 ))}
             </View>

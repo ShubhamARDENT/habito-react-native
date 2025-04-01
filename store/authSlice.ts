@@ -1,7 +1,8 @@
-import { createSlice, PayloadAction, configureStore } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
 import { router } from "expo-router";
+import { AppDispatch } from "./store";
 
 interface AuthState {
     token: string | null;
@@ -47,13 +48,7 @@ const authSlice = createSlice({
 
 export const { setToken, setUserName, setUserEmail, setLoading, resetAuth, setUserId } = authSlice.actions;
 
-export const store = configureStore({
-    reducer: {
-        auth: authSlice.reducer,
-    },
-});
-
-export const login = (authToken: string, type: string = "login") => async (dispatch: any) => {
+export const login = (authToken: string, type: string = "login") => async (dispatch: AppDispatch) => {
     try {
         await AsyncStorage.setItem("token", authToken);
         const decoded = jwtDecode<{ name: string; email: string; sub: string }>(authToken);
@@ -68,7 +63,7 @@ export const login = (authToken: string, type: string = "login") => async (dispa
     }
 };
 
-export const logout = () => async (dispatch: any) => {
+export const logout = () => async (dispatch: AppDispatch) => {
     try {
         await AsyncStorage.removeItem("token");
         dispatch(resetAuth());
@@ -78,7 +73,7 @@ export const logout = () => async (dispatch: any) => {
     }
 };
 
-export const loadToken = () => async (dispatch: any) => {
+export const loadToken = () => async (dispatch: AppDispatch) => {
     dispatch(setLoading(true));
     try {
         const storedToken = await AsyncStorage.getItem("token");
@@ -96,5 +91,4 @@ export const loadToken = () => async (dispatch: any) => {
     }
 };
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+export default authSlice.reducer;

@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, logout, RootState } from './auth';
+import { AppDispatch, RootState } from '../store/store';
+import { logout } from '../store/authSlice';
 
 const Header = () => {
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
-    const userName = useSelector((state: RootState) => state.auth.userName);
+    const { userName } = useSelector((state: RootState) => state.auth);
 
     const handleLogout = async () => {
         try {

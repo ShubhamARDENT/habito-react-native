@@ -3,7 +3,8 @@ import React, { useEffect } from 'react';
 import '../global.css';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadToken, RootState, AppDispatch } from '@/components/auth';
+import { RootState, AppDispatch } from '../store/store';
+import { loadToken } from '../store/authSlice';
 import OnBoradingScreen from './OnBoradingScreen/Index';
 import Home from './(tabs)';
 

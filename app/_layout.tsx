@@ -1,7 +1,7 @@
 import React from 'react';
 import { Stack } from 'expo-router';
 import { Provider } from 'react-redux';
-import { store } from '@/components/auth';
+import { store } from '../store/store';
 
 const RootLayout = () => {
     return (

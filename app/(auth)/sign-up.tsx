@@ -13,7 +13,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useDispatch } from "react-redux";
-import { AppDispatch, login, setLoading } from "@/components/auth";
+import { AppDispatch } from "../../store/store";
+import { login, setLoading } from "../../store/authSlice";
 
 const API_URL = Platform.select({
     android: 'http://10.0.2.2:8000/api/v1/auth/signup', // Android emulator

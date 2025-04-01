@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator, Platform } from 'react-native';
 import { useSelector } from 'react-redux';
-import { RootState } from './auth';
 import HabitCards from './HabitCards';
+import { RootState } from '@/store/store';
 
 const API_URI = Platform.select({
     ios: 'http://localhost:8000',

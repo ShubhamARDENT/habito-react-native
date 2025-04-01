@@ -4,7 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, login, setLoading, RootState } from '@/components/auth';
+import { AppDispatch,  RootState } from '../../store/store';
+import { login, setLoading } from '../../store/authSlice';
 
 const API_URL = Platform.select({
     android: 'http://10.0.2.2:8000', // Android emulator
