@@ -6,6 +6,20 @@ import { AppDispatch, RootState } from '@/store/store';
 import { SeletedHabit, setSelectedHabitList } from '@/store/habitSlice';
 import { fetchUserHabits } from '@/services/api';
 
+// Add this helper function at the top of the file after imports
+const normalizeDayName = (day: string) => {
+    const dayMap: { [key: string]: string } = {
+        'Monday': 'Mon',
+        'Tuesday': 'Tue',
+        'Wednesday': 'Wed',
+        'Thursday': 'Thu',
+        'Friday': 'Fri',
+        'Saturday': 'Sat',
+        'Sunday': 'Sun',
+    };
+    return dayMap[day] || day.slice(0, 3);
+};
+
 const API_URI = Platform.select({
     ios: 'http://localhost:8000',
     android: 'http://10.0.2.2:8000',
@@ -20,7 +34,7 @@ const Habits = () => {
 
     useEffect(() => {
         fetchSelectedHabits();
-    }, []);
+    }, [selectedDay]);
 
     const fetchSelectedHabits = async () => {
         try {
@@ -54,20 +68,32 @@ const Habits = () => {
         }
     };
 
+    const renderHabits = () => {
+        return selectedHabitList?.map(({ id, habit_details }) => {
+            const normalizedSelectedDay = normalizeDayName(selectedDay);
+            const normalizedHabitDays = habit_details?.selectedDays?.map(normalizeDayName);
+            
+            if (id && normalizedHabitDays && 
+                Array.isArray(normalizedHabitDays) && 
+                normalizedHabitDays.includes(normalizedSelectedDay)) {
+                return (
+                    <HabitCards 
+                        key={`${id}-${selectedDay}`} 
+                        item={habit_details}
+                        handleDeleteHabits={handleDeleteHabits} 
+                    />
+                );
+            }
+            return null;
+        });
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.header_view}>
                 <Text style={styles.header}>Habits</Text>
-                {/* <Text style={styles.view}>VIEW ALL</Text> */}
             </View>
-
-            {selectedHabitList?.length > 0 && selectedHabitList?.map(({ id, habit_details }) => (
-                id ? (habit_details.selectedDays.includes(selectedDay) &&
-                    <HabitCards key={id} item={habit_details} handleDeleteHabits={handleDeleteHabits} />
-                ) : (
-                    <Text key={`invalid`} style={{ color: "red" }}>Invalid habit data</Text>
-                )
-            ))}
+            {selectedHabitList?.length > 0 && renderHabits()}
         </View>
     );
 };
